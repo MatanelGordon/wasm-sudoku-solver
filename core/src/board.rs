@@ -85,25 +85,25 @@ impl Board {
         (self.size as f32).sqrt().floor() as usize
     }
 
-    pub fn at(&self, row: usize, col: usize) -> StrResult<usize> {
-        let row_list = self.rows.get(row).ok_or(format!("Could not get row of {row}"))?;
-        let item_ref = row_list.get(col).ok_or(format!("Could not get col of {col}"))?;
+    pub fn at(&self, row: usize, col: usize) -> Option<usize> {
+        let row_list = self.rows.get(row)?;
+        let item_ref = row_list.get(col)?;
 
-        Ok(*item_ref)
+        Some(*item_ref)
     }
 
-    pub fn get_row(&self, index: usize) -> StrResult<&Vec<usize>> {
-        self.rows.get(index).ok_or(format!("Could not get row {index}"))
+    pub fn get_row(&self, index: usize) -> Option<&Vec<usize>> {
+        self.rows.get(index)
     }
 
-    pub fn get_col(&self, index: usize) -> StrResult<&Vec<usize>> {
-        self.cols.get(index).ok_or(format!("Could not get col {index}"))
+    pub fn get_col(&self, index: usize) -> Option<&Vec<usize>> {
+        self.cols.get(index)
     }
 
-    pub fn get_square(&self, row: usize, col: usize) -> StrResult<&Vec<usize>>{
+    pub fn get_square(&self, row: usize, col: usize) -> Option<&Vec<usize>>{
         let square_size = self.get_square_size();
         let square_position = row / square_size * square_size + col / square_size;
-        self.squares.get(square_position).ok_or(format!("Could not get square for r:{row}, c:{col}"))
+        self.squares.get(square_position)
     }
 
     pub fn set(&mut self, row: usize, col: usize, value: usize) {
@@ -116,7 +116,7 @@ impl Board {
         self.squares[square_position][inner_square_index] = value;
     }
 
-    fn get_square_cloned(&self, row: usize, col: usize) -> StrResult<Vec<usize>> {
+    fn get_square_cloned(&self, row: usize, col: usize) -> Option<Vec<usize>> {
         let square_size = self.get_square_size();
         let square_start_x = col / square_size * square_size;
         let square_start_y = row / square_size * square_size;
@@ -127,26 +127,26 @@ impl Board {
                 |i| self.get_row_partial(i, square_start_x, square_start_x + square_size).unwrap()
             ).collect();
 
-        Ok(square_data)
+        Some(square_data)
     }
 
-    fn get_row_partial(&self, index: usize, start: usize, end: usize) -> StrResult<Vec<usize>> {
-        let row_list = self.rows.get(index).ok_or(format!("Could not get row of {index}"))?;
+    fn get_row_partial(&self, index: usize, start: usize, end: usize) -> Option<Vec<usize>> {
+        let row_list = self.rows.get(index)?;
         let row_partial = row_list[start..end].to_vec();
-        Ok(row_partial)
+        Some(row_partial)
     }
 
-    fn get_col_partial(&self, index: usize, start: usize, end: usize) -> StrResult<Vec<usize>> {
-        let res_col_list: Vec<StrResult<usize>> = (start..end).map(|row| self.at(row, index)).collect();
+    fn get_col_partial(&self, index: usize, start: usize, end: usize) -> Option<Vec<usize>> {
+        let res_col_list: Vec<Option<usize>> = (start..end).map(|row| self.at(row, index)).collect();
 
-        let operationErr = res_col_list.iter().find(|r| r.is_err());
+        let operationErr = res_col_list.iter().find(|r| r.is_none());
 
-        if let Some(Err(error)) = operationErr {
-            return Err(String::from(error));
+        if let Some(Some(error)) = operationErr {
+            return None;
         }
 
-        let col_list = res_col_list.into_iter().map(Result::unwrap).collect();
+        let col_list = res_col_list.into_iter().map(Option::unwrap).collect();
 
-        Ok(col_list)
+        Some(col_list)
     }
 }

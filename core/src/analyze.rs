@@ -12,11 +12,11 @@ pub enum AnalyzedCell {
 
 pub type AnalyzedBoard = Vec<Vec<AnalyzedCell>>;
 
-pub fn analyze_cell(board: &Board, row: usize, col: usize) -> StrResult<AnalyzedCell> {
+pub fn analyze_cell(board: &Board, row: usize, col: usize) -> Option<AnalyzedCell> {
     let value = board.at(row, col)?;
 
     if value > 0{
-        return Ok(AnalyzedCell::Determined(value));
+        return Some(AnalyzedCell::Determined(value));
     }
 
     let size = board.get_size();
@@ -38,14 +38,14 @@ pub fn analyze_cell(board: &Board, row: usize, col: usize) -> StrResult<Analyzed
     let possible_options = all_options.difference(&occupied_options).map(|val| *val).collect::<Vec<_>>();
 
     if possible_options.len() == 0 {
-        return Ok(AnalyzedCell::Invalid);
+        return Some(AnalyzedCell::Invalid);
     }
 
     if possible_options.len() == 1{
-        return Ok(AnalyzedCell::Determined(possible_options[0]));
+        return Some(AnalyzedCell::Determined(possible_options[0]));
     }
 
-    Ok(AnalyzedCell::Undetermined(possible_options))
+    Some(AnalyzedCell::Undetermined(possible_options))
 }
 
 
