@@ -16,7 +16,12 @@ pub mod tests {
 
     #[test]
     fn from_defined_vectors() {
-        let data: BoardData = vec![vec![1,1,0,1],vec![1,1,0,1],vec![0,1,0,1],vec![0,1,0,1]];
+        let data: BoardData = vec![
+            vec![1, 1, 0, 1],
+            vec![1, 1, 0, 1],
+            vec![0, 1, 0, 1],
+            vec![0, 1, 0, 1],
+        ];
         let board = Board::from(&data);
         assert!(board.is_ok())
     }
@@ -32,8 +37,8 @@ pub mod tests {
 
         println!("{:?}", board);
 
-        let received = board.at(row,col).expect("could not use at()");
-        assert_eq!(received, expected);
+        let received = board.at(row, col).expect("could not use at()");
+        assert_eq!(*received, expected);
     }
 
     // #[test]

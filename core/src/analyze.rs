@@ -1,6 +1,5 @@
-use std::collections::HashSet;
 use crate::board::Board;
-use crate::types::StrResult;
+use std::collections::HashSet;
 
 #[derive(Debug, Clone)]
 pub enum AnalyzedCell {
@@ -13,9 +12,10 @@ pub enum AnalyzedCell {
 pub type AnalyzedBoard = Vec<Vec<AnalyzedCell>>;
 
 pub fn analyze_cell(board: &Board, row: usize, col: usize) -> Option<AnalyzedCell> {
-    let value = board.at(row, col)?;
+    let value_ref = board.at(row, col)?;
+    let value = *value_ref;
 
-    if value > 0{
+    if value > 0 {
         return Some(AnalyzedCell::Determined(value));
     }
 
@@ -35,17 +35,20 @@ pub fn analyze_cell(board: &Board, row: usize, col: usize) -> Option<AnalyzedCel
         .filter(|v| *v != 0)
         .collect::<HashSet<_>>();
 
-    let possible_options = all_options.difference(&occupied_options).map(|val| *val).collect::<Vec<_>>();
+    let possible_options = all_options
+        .difference(&occupied_options)
+        .map(|val| *val)
+        .collect::<Vec<_>>();
 
     if possible_options.len() == 0 {
         return Some(AnalyzedCell::Invalid);
     }
 
-    if possible_options.len() == 1{
+    if possible_options.len() == 1 {
         return Some(AnalyzedCell::Determined(possible_options[0]));
     }
 
     Some(AnalyzedCell::Undetermined(possible_options))
 }
 
-
+pub fn analyzeBoard(board: &Board) {}
