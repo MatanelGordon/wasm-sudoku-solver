@@ -10,16 +10,16 @@ pub enum AnalyzedCell {
 pub type AnalyzedBoardData = BoardData<AnalyzedCell>;
 pub type AnalyzedBoard = Board<AnalyzedCell>;
 
-struct InferredPosition {
+struct BoardPosition {
     pub row: usize,
     pub col: usize,
     pub value: usize,
 }
 
-fn infer_square_reduction(analyzed_board: &AnalyzedBoard) -> Vec<InferredPosition> {
+fn infer_square_reduction(analyzed_board: &AnalyzedBoard) -> Vec<BoardPosition> {
     let size = analyzed_board.get_size();
     let square_size = analyzed_board.get_square_size();
-    let mut square_inferring: Vec<InferredPosition> = vec![];
+    let mut square_inferring: Vec<BoardPosition> = vec![];
     //narrowing down the options using smart inferring
     for square_row in 0..analyzed_board.get_square_size() {
         for square_col in 0..analyzed_board.get_square_size() {
@@ -62,7 +62,7 @@ fn infer_square_reduction(analyzed_board: &AnalyzedBoard) -> Vec<InferredPositio
                     let row = square_row * square_size + inner_row;
                     let col = square_col * square_size + inner_col;
 
-                    square_inferring.push(InferredPosition { value, row, col })
+                    square_inferring.push(BoardPosition { value, row, col })
                 });
         }
     }
