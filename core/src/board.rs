@@ -23,11 +23,22 @@ impl Board<usize> {
     pub fn new(size: usize) -> StrResult<Self> {
         Board::from(&vec![vec![0; size]; size])
     }
+
+    pub fn is_full(&self) -> bool {
+        self.rows
+            .iter()
+            .find(|col| col.iter().find(|cell| **cell == 0).is_some())
+            .is_none()
+    }
+
+    pub fn is_valid_numerical(&self) -> bool{
+        self.get_rows_flat().iter().map(|x| *x).find(|v| **v < 0 || **v > self.size).is_some()
+    }
 }
 
 impl<T> Board<T>
-    where
-        T: Clone,
+where
+    T: Clone,
 {
     pub fn from(data: &BoardData<T>) -> StrResult<Self> {
         match Board::<T>::validate_matrix(data) {
@@ -112,6 +123,14 @@ impl<T> Board<T>
         let square_size = self.get_square_size();
         let square_position = row / square_size * square_size + col / square_size;
         self.squares.get(square_position)
+    }
+
+    pub fn get_rows(&self) -> &BoardData<T> {
+        &self.rows
+    }
+
+    pub fn get_rows_flat(&self) -> Vec<&T> {
+        self.get_rows().iter().flatten().collect()
     }
 
     pub fn set(&mut self, row: usize, col: usize, value: T) {
