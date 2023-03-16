@@ -37,7 +37,7 @@ fn infer_square_reduction(analyzed_board: &AnalyzedBoard) -> Vec<BoardPosition> 
             let enumerated_square_options = square
                 .iter()
                 .enumerate()
-                .filter(|&(i, analyzed)| matches!(analyzed, AnalyzedCell::Undetermined(_)));
+                .filter(|&(_, analyzed)| matches!(analyzed, AnalyzedCell::Undetermined(_)));
 
             single_repeating_values
                 .clone()
@@ -45,7 +45,7 @@ fn infer_square_reduction(analyzed_board: &AnalyzedBoard) -> Vec<BoardPosition> 
                     // find the square index which value belongs to.
                     let chosen_index = enumerated_square_options
                         .clone()
-                        .filter(|&(index, analyzed)| {
+                        .filter(|&(_, analyzed)| {
                             if let AnalyzedCell::Undetermined(options) = analyzed {
                                 return options.iter().find(|&&opt| opt == value).is_some();
                             }
