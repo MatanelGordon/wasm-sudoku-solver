@@ -1,8 +1,5 @@
 use crate::types::StrResult;
 use crate::validators::{is_square, is_square_matrix};
-use std::cell::RefCell;
-use std::collections::HashMap;
-use std::ops::Deref;
 
 pub type BoardData<T = usize> = Vec<Vec<T>>;
 
@@ -29,8 +26,8 @@ impl Board<usize> {
 }
 
 impl<T> Board<T>
-where
-    T: Clone,
+    where
+        T: Clone,
 {
     pub fn from(data: &BoardData<T>) -> StrResult<Self> {
         match Board::<T>::validate_matrix(data) {
