@@ -79,7 +79,7 @@ pub mod board_tests {
 
     #[test]
     fn board_valid_numerical() {
-        let mut board = Board::new(4).expect("Failed initializing board");
+        let board = Board::new(4).expect("Failed initializing board");
         assert!(board.is_valid_numerical());
     }
 }
