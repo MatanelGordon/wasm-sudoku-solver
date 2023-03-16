@@ -27,12 +27,12 @@ impl Board<usize> {
     pub fn is_full(&self) -> bool {
         self.rows
             .iter()
-            .find(|col| col.iter().find(|cell| **cell == 0).is_some())
+            .find(|&col| col.iter().find(|&&cell| cell == 0).is_some())
             .is_none()
     }
 
     pub fn is_valid_numerical(&self) -> bool{
-        self.get_rows_flat().iter().map(|x| *x).find(|v| **v < 0 || **v > self.size).is_some()
+        self.get_rows_flat().iter().map(|&&x| x).find(|&val| val > self.size).is_none()
     }
 }
 
