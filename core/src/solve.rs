@@ -3,10 +3,10 @@ use crate::board::Board;
 use crate::types::StrResult;
 use std::vec;
 
-pub fn solve(board: &Board) -> Vec<Board> {
+fn solve_inner(board: &AnalyzedBoard) -> Vec<AnalyzedBoard> {
     vec![]
 }
 
-pub fn solve_inner(board: &AnalyzedBoard) -> Vec<Board> {
+pub fn solve(board: &Board) -> Vec<Board> {
     vec![]
 }
