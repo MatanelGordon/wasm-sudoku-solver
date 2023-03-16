@@ -35,52 +35,50 @@ pub mod board_tests {
 
         board.set(row, col, expected);
 
-        println!("{:?}", board);
-
         let received = board.at(row, col).expect("could not use at()");
         assert_eq!(*received, expected);
     }
 
     #[test]
-    fn flat_row_correct_length(){
+    fn flat_row_correct_length() {
         let size: usize = 4;
         let board = Board::new(size).expect("could not create board");
         assert_eq!(board.get_rows_flat().len(), size.pow(2));
     }
 
     #[test]
-    fn board_is_full(){
-        let data: BoardData<usize> =  vec![
-            vec![1,1,1,1],
-            vec![1,1,1,1],
-            vec![1,1,1,1],
-            vec![1,1,1,1]
+    fn board_is_full() {
+        let data: BoardData<usize> = vec![
+            vec![1, 1, 1, 1],
+            vec![1, 1, 1, 1],
+            vec![1, 1, 1, 1],
+            vec![1, 1, 1, 1],
         ];
         let board: Board = Board::from(&data).expect("Failed creating board");
         assert!(board.is_full())
     }
 
     #[test]
-    fn board_is_not_full(){
-        let data: BoardData<usize> =  vec![
-            vec![1,1,1,1],
-            vec![1,1,0,1],
-            vec![1,0,1,1],
-            vec![1,1,1,1]
+    fn board_is_not_full() {
+        let data: BoardData<usize> = vec![
+            vec![1, 1, 1, 1],
+            vec![1, 1, 0, 1],
+            vec![1, 0, 1, 1],
+            vec![1, 1, 1, 1],
         ];
         let board: Board = Board::from(&data).expect("Failed creating board");
         assert!(!board.is_full())
     }
 
     #[test]
-    fn board_invalid_numerical(){
+    fn board_invalid_numerical() {
         let mut board = Board::new(4).expect("Failed initializing board");
-        board.set(0,1,100);
+        board.set(0, 1, 100);
         assert!(!board.is_valid_numerical());
     }
 
     #[test]
-    fn board_valid_numerical(){
+    fn board_valid_numerical() {
         let mut board = Board::new(4).expect("Failed initializing board");
         assert!(board.is_valid_numerical());
     }
@@ -88,7 +86,7 @@ pub mod board_tests {
 
 #[cfg(test)]
 pub mod analyze_tests {
-    use crate::analyze::{analyze_board, analyze_cell, AnalyzedCell, is_invalid_analyze};
+    use crate::analyze::{analyze_board, analyze_cell, AnalyzedCell};
     use crate::board::Board;
 
     #[test]
@@ -103,17 +101,37 @@ pub mod analyze_tests {
     }
 
     #[test]
-    fn invalidate_board(){
-        //creating invalid board
-        let mut board = Board::new(4).expect("Failed setting up board");
-        board.set(0,0,1);
-        board.set(0,1,2);
-        board.set(1,0,3);
-        board.set(1,3,4);
+    fn analyze_board_with_square_inferring() {
+        let mut board = Board::new(9).expect("Could not create board");
+        board.set(5, 0, 6);
+        board.set(8, 1, 6);
+        board.set(0, 4, 6);
+        board.set(2, 7, 6);
+        // should infer that (1,2) is 6 using square inferring
+        /*
+        +---+---+---+---+---+---+---+---+---+
+        | 0 | 0 | 0 | 0 | 6 | 0 | 0 | 0 | 0 |
+        +---+---+---+---+---+---+---+---+---+
+        | 0 | 0 | X | 0 | 0 | 0 | 0 | 0 | 0 |
+        +---+---+---+---+---+---+---+---+---+
+        | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 6 | 0 |
+        +---+---+---+---+---+---+---+---+---+
+        | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+        +---+---+---+---+---+---+---+---+---+
+        | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+        +---+---+---+---+---+---+---+---+---+
+        | 6 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+        +---+---+---+---+---+---+---+---+---+
+        | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+        +---+---+---+---+---+---+---+---+---+
+        | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+        +---+---+---+---+---+---+---+---+---+
+        | 0 | 6 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+        +---+---+---+---+---+---+---+---+---+
+        */
 
         let analyzed = analyze_board(&board).expect("could not analyze board");
-        let is_invalid = is_invalid_analyze(&analyzed);
 
-        assert!(is_invalid);
+        assert_eq!(analyzed.at(1, 2).unwrap(), &AnalyzedCell::Value(6));
     }
 }

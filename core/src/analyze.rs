@@ -1,9 +1,9 @@
 use crate::board::{Board, BoardData};
 use std::collections::HashSet;
+use std::iter::Enumerate;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum AnalyzedCell {
-    Invalid,
     Value(usize),
     Undetermined(Vec<usize>),
 }
@@ -14,6 +14,10 @@ pub type AnalyzedBoard = Board<AnalyzedCell>;
 pub fn analyze_cell(board: &Board, row: usize, col: usize) -> Option<AnalyzedCell> {
     let value_ref = board.at(row, col)?;
     let value = *value_ref;
+
+    if value > board.get_size() {
+        return None;
+    }
 
     if value > 0 {
         return Some(AnalyzedCell::Value(value));
@@ -42,7 +46,7 @@ pub fn analyze_cell(board: &Board, row: usize, col: usize) -> Option<AnalyzedCel
         .collect::<Vec<_>>();
 
     if possible_options.len() == 0 {
-        return Some(AnalyzedCell::Invalid);
+        return None;
     }
 
     if possible_options.len() == 1 {
@@ -52,8 +56,69 @@ pub fn analyze_cell(board: &Board, row: usize, col: usize) -> Option<AnalyzedCel
     Some(AnalyzedCell::Undetermined(possible_options))
 }
 
-pub fn is_invalid_analyze(analyzed_board: &AnalyzedBoard) -> bool {
-    analyzed_board.get_rows_flat().iter().find(|val| ***val == AnalyzedCell::Invalid ).is_some()
+struct InferredPosition {
+    pub row: usize,
+    pub col: usize,
+    pub value: usize,
+}
+
+fn infer_square_reduction(analyzed_board: &AnalyzedBoard) -> Vec<InferredPosition> {
+    let size = analyzed_board.get_size();
+    let square_size = analyzed_board.get_square_size();
+    let mut square_inferring: Vec<InferredPosition> = vec![];
+    //narrowing down the options using smart inferring
+    for square_row in 0..analyzed_board.get_square_size() {
+        for square_col in 0..analyzed_board.get_square_size() {
+            let square = analyzed_board.get_square(square_row, square_col).unwrap();
+
+            let flatten_options: Vec<usize> = square
+                .iter()
+                .flat_map(|a| match a {
+                    AnalyzedCell::Value(val) => vec![*val],
+                    AnalyzedCell::Undetermined(options) => options.to_vec(),
+                })
+                .collect();
+
+            let single_repeating_values: Vec<usize> = (1..=size)
+                .into_iter()
+                .filter(|&n| flatten_options.iter().filter(|&&val| val == n).count() == 1)
+                .collect();
+
+            let enumerated_square_options: Vec<(usize, &AnalyzedCell)> =
+                square
+                    .iter()
+                    .enumerate()
+                    .filter(|&(i, analyzed)| matches!(analyzed, AnalyzedCell::Undetermined(_)))
+                    .collect();
+
+            single_repeating_values
+                .iter()
+                .map(|&value| {
+                    // find the square index which value belongs to.
+                    let chosen_index = enumerated_square_options
+                        .iter()
+                        .filter(|&(index, analyzed)| {
+                            if let AnalyzedCell::Undetermined(options) = analyzed {
+                                return options.iter().find(|&&opt| opt == value).is_some()
+                            }
+                            false
+                        })
+                        .map(|&x| x.0)
+                        .next()
+                        .unwrap();
+                    return (chosen_index, value);
+                })
+                .for_each(|(index, value)| {
+                    let inner_row = index / square_size;
+                    let inner_col = index % square_size;
+                    let row = square_row * square_size + inner_row;
+                    let col = square_col * square_size + inner_col;
+
+                    square_inferring.push(InferredPosition { value, row, col })
+                });
+        }
+    }
+    return square_inferring;
 }
 
 pub fn analyze_board(board: &Board) -> Option<AnalyzedBoard> {
@@ -69,5 +134,13 @@ pub fn analyze_board(board: &Board) -> Option<AnalyzedBoard> {
         board_size_data.push(row_list);
     }
 
-    return Board::from(&board_size_data).ok();
+    let mut analyzed_board = Board::from(&board_size_data).ok()?;
+
+    infer_square_reduction(&analyzed_board)
+        .into_iter()
+        .for_each(|x| {
+            analyzed_board.set(x.row, x.col, AnalyzedCell::Value(x.value));
+        });
+
+    return Some(analyzed_board);
 }

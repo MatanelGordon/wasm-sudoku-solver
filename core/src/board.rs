@@ -31,8 +31,12 @@ impl Board<usize> {
             .is_none()
     }
 
-    pub fn is_valid_numerical(&self) -> bool{
-        self.get_rows_flat().iter().map(|&&x| x).find(|&val| val > self.size).is_none()
+    pub fn is_valid_numerical(&self) -> bool {
+        self.get_rows_flat()
+            .iter()
+            .map(|&&x| x)
+            .find(|&val| val > self.size)
+            .is_none()
     }
 }
 
@@ -141,6 +145,15 @@ where
         self.rows[row][col] = value.clone();
         self.cols[col][row] = value.clone();
         self.squares[square_position][inner_square_index] = value.clone();
+    }
+
+    pub fn set_inner_square(&mut self, s_row: usize, s_col: usize, s_index: usize, value: T) {
+        let square_size = self.get_square_size();
+        let inner_row = s_index / square_size;
+        let inner_col = s_index % square_size;
+        let row = s_row * square_size + inner_row;
+        let col = s_col * square_size + inner_col;
+        self.set(row, col, value);
     }
 
     fn get_square_cloned(&self, row: usize, col: usize) -> Option<Vec<T>> {
