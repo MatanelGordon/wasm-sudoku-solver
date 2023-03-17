@@ -135,3 +135,16 @@ pub mod analyze_tests {
         assert_eq!(analyzed.at(1, 2).unwrap(), &AnalyzedCell::Value(6));
     }
 }
+
+#[cfg(test)]
+pub mod my_tests {
+    use rand::Rng;
+
+    #[test]
+    fn main_test() {
+        let mut rng = rand::thread_rng();
+
+        let n1: usize = rng.gen();
+        println!("Hello there {n1}");
+    }
+}
