@@ -171,14 +171,14 @@ pub mod analyze_suite {
 }
 
 #[cfg(test)]
-pub mod solve_suite{
+pub mod solve_suite {
     use crate::analyze::analyze_board;
     use crate::board::{Board, BoardData};
     use crate::solve::to_board;
 
     #[test]
-    fn convert_to_board(){
-        let board_data: BoardData<usize> = vec![vec![6;9];9];
+    fn convert_to_board() {
+        let board_data: BoardData<usize> = vec![vec![6; 9]; 9];
         let board = Board::from(&board_data).expect("Failed to create board");
         let analyzed_board = analyze_board(&board).expect("Failed to analyze board");
         let new_board = to_board(&analyzed_board).expect("Failed to run to_board");
@@ -186,7 +186,7 @@ pub mod solve_suite{
     }
 
     #[test]
-    fn fail_to_board(){
+    fn fail_to_board() {
         let board = Board::new(9).expect("Failed to create board");
         let analyzed_board = analyze_board(&board).expect("Failed to analyze board");
         assert!(to_board(&analyzed_board).is_err());
