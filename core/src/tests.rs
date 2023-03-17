@@ -1,5 +1,5 @@
 #[cfg(test)]
-pub mod board_tests {
+pub mod board_suite {
     use crate::board::{Board, BoardData};
     use crate::types::PositionalValue;
 
@@ -88,38 +88,38 @@ pub mod board_tests {
     fn board_filter_specific_value() {
         let mut board = Board::new(4).expect("Failed initializing board");
         let value = &6;
-        let expected: Vec<PositionalValue<&usize>>  = vec![
-            PositionalValue{
+        let expected: Vec<PositionalValue<&usize>> = vec![
+            PositionalValue {
                 value,
                 row: 1,
                 col: 2,
             },
-            PositionalValue{
+            PositionalValue {
                 value,
-                row:0,
+                row: 0,
                 col: 0,
             },
-            PositionalValue{
+            PositionalValue {
                 value,
-                row:0,
+                row: 0,
                 col: 1,
-            }
+            },
         ];
 
-        for &PositionalValue{row, col, value} in expected.iter() {
+        for &PositionalValue { row, col, value } in expected.iter() {
             board.set(row, col, *value);
         }
 
         let mut results = board.filter(|v| v == value);
 
-        results.sort_by(|a,b| b.row.cmp(&a.row));
+        results.sort_by(|a, b| b.row.cmp(&a.row));
 
         assert_eq!(&results, &expected);
     }
 }
 
 #[cfg(test)]
-pub mod analyze_tests {
+pub mod analyze_suite {
     use crate::analyze::{analyze_board, analyze_cell, AnalyzedCell};
     use crate::board::Board;
 
@@ -167,6 +167,29 @@ pub mod analyze_tests {
         let analyzed = analyze_board(&board).expect("could not analyze board");
 
         assert_eq!(analyzed.at(1, 2).unwrap(), &AnalyzedCell::Value(6));
+    }
+}
+
+#[cfg(test)]
+pub mod solve_suite{
+    use crate::analyze::analyze_board;
+    use crate::board::{Board, BoardData};
+    use crate::solve::to_board;
+
+    #[test]
+    fn convert_to_board(){
+        let board_data: BoardData<usize> = vec![vec![6;9];9];
+        let board = Board::from(&board_data).expect("Failed to create board");
+        let analyzed_board = analyze_board(&board).expect("Failed to analyze board");
+        let new_board = to_board(&analyzed_board).expect("Failed to run to_board");
+        assert_eq!(new_board.get_rows(), &board_data);
+    }
+
+    #[test]
+    fn fail_to_board(){
+        let board = Board::new(9).expect("Failed to create board");
+        let analyzed_board = analyze_board(&board).expect("Failed to analyze board");
+        assert!(to_board(&analyzed_board).is_err());
     }
 }
 
