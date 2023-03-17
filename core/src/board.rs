@@ -1,4 +1,4 @@
-use crate::types::StrResult;
+use crate::types::{PositionalValue, StrResult};
 use crate::validators::{is_square, is_square_matrix};
 
 pub type BoardData<T = usize> = Vec<Vec<T>>;
@@ -154,6 +154,29 @@ where
         let row = s_row * square_size + inner_row;
         let col = s_col * square_size + inner_col;
         self.set(row, col, value);
+    }
+
+    pub fn filter<P>(&self, mut predicate: P) -> Vec<PositionalValue<&T>>
+    where
+        P: FnMut(&T) -> bool,
+    {
+        let size = self.size;
+        let mut results: Vec<PositionalValue<&T>> = vec![];
+
+        for row in 0..size {
+            for col in 0..size {
+                let item = self.at(row, col).unwrap();
+                if predicate(item) {
+                    results.push(PositionalValue {
+                        col,
+                        row,
+                        value: item,
+                    })
+                }
+            }
+        }
+
+        return results;
     }
 
     fn get_square_cloned(&self, row: usize, col: usize) -> Option<Vec<T>> {

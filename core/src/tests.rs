@@ -1,6 +1,7 @@
 #[cfg(test)]
 pub mod board_tests {
     use crate::board::{Board, BoardData};
+    use crate::types::PositionalValue;
 
     #[test]
     fn create_empty_board() {
@@ -81,6 +82,39 @@ pub mod board_tests {
     fn board_valid_numerical() {
         let board = Board::new(4).expect("Failed initializing board");
         assert!(board.is_valid_numerical());
+    }
+
+    #[test]
+    fn board_filter_specific_value() {
+        let mut board = Board::new(4).expect("Failed initializing board");
+        let value = &6;
+        let expected: Vec<PositionalValue<&usize>>  = vec![
+            PositionalValue{
+                value,
+                row: 1,
+                col: 2,
+            },
+            PositionalValue{
+                value,
+                row:0,
+                col: 0,
+            },
+            PositionalValue{
+                value,
+                row:0,
+                col: 1,
+            }
+        ];
+
+        for &PositionalValue{row, col, value} in expected.iter() {
+            board.set(row, col, *value);
+        }
+
+        let mut results = board.filter(|v| v == value);
+
+        results.sort_by(|a,b| b.row.cmp(&a.row));
+
+        assert_eq!(&results, &expected);
     }
 }
 
