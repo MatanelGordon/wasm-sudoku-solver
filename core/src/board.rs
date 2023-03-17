@@ -19,15 +19,17 @@ pub struct Board<T = usize> {
     squares: BoardData<T>,
 }
 
+const EMPTY_ITEM: usize = 0;
+
 impl Board<usize> {
     pub fn new(size: usize) -> StrResult<Self> {
-        Board::from(&vec![vec![0; size]; size])
+        Board::from(&vec![vec![EMPTY_ITEM; size]; size])
     }
 
     pub fn is_full(&self) -> bool {
         self.rows
             .iter()
-            .find(|&col| col.iter().find(|&&cell| cell == 0).is_some())
+            .find(|&col| col.iter().find(|&&cell| cell == EMPTY_ITEM).is_some())
             .is_none()
     }
 
