@@ -187,8 +187,8 @@ pub mod solve_suite {
 
     #[test]
     fn fail_to_board() {
-        let board = Board::new(9).expect("Failed to create board");
-        let analyzed_board = analyze_board(&board).expect("Failed to analyze board");
+        let empty_board = Board::new(9).expect("Failed to create board");
+        let analyzed_board = analyze_board(&empty_board).expect("Failed to analyze board");
         assert!(to_board(&analyzed_board).is_err());
     }
 }
