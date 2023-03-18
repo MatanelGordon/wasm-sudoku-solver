@@ -181,6 +181,28 @@ where
         return results;
     }
 
+    pub fn find<P>(&self, mut predicate: P) -> Option<PositionalValue<&T>>
+    where
+        P: FnMut(&T) -> bool,
+    {
+        let size = self.size;
+
+        for row in 0..size {
+            for col in 0..size {
+                let item = self.at(row, col).unwrap();
+                if predicate(item) {
+                    return Some(PositionalValue {
+                        col,
+                        row,
+                        value: item,
+                    });
+                }
+            }
+        }
+
+        return None;
+    }
+
     fn get_square_cloned(&self, row: usize, col: usize) -> Option<Vec<T>> {
         let square_size = self.get_square_size();
         let square_start_x = col / square_size * square_size;
