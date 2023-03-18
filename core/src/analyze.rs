@@ -1,4 +1,5 @@
 use crate::board::{Board, BoardData};
+use crate::types::StrResult;
 use std::collections::HashSet;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -75,6 +76,35 @@ pub fn is_full_board(board: &AnalyzedBoard) -> bool {
         .into_iter()
         .find(|&cell| matches!(cell, &AnalyzedCell::Undetermined(_)))
         .is_none()
+}
+
+pub fn to_board(analyzed_board: &AnalyzedBoard) -> StrResult<Board> {
+    let data = analyzed_board.get_rows_flat();
+    let has_undetermined = data
+        .iter()
+        .find(|&&val| matches!(val, &AnalyzedCell::Undetermined(_)))
+        .is_some();
+
+    if has_undetermined {
+        return Err(format!(
+            "Could not convert to numerical board: Found Undetermined items"
+        ));
+    }
+
+    let data: BoardData<usize> = analyzed_board
+        .get_rows()
+        .iter()
+        .map(|row| {
+            row.iter()
+                .map(|cell| match cell {
+                    AnalyzedCell::Value(val) => *val,
+                    AnalyzedCell::Undetermined(_) => 0,
+                })
+                .collect()
+        })
+        .collect();
+
+    Board::from(&data)
 }
 
 pub fn analyze_cell(board: &Board, row: usize, col: usize) -> Option<AnalyzedCell> {

@@ -172,9 +172,8 @@ pub mod analyze_suite {
 
 #[cfg(test)]
 pub mod solve_suite {
-    use crate::analyze::analyze_board;
+    use crate::analyze::{analyze_board, to_board};
     use crate::board::{Board, BoardData};
-    use crate::solve::to_board;
 
     #[test]
     fn convert_to_board() {
