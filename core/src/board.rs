@@ -131,6 +131,13 @@ where
         self.squares.get(square_position)
     }
 
+    pub fn get_square_1d(&self, index: usize) -> Option<&Vec<T>> {
+        let square_size = self.get_square_size();
+        let row = index / square_size;
+        let col = index % square_size;
+        self.get_square(row, col)
+    }
+
     pub fn get_rows(&self) -> &BoardData<T> {
         &self.rows
     }
