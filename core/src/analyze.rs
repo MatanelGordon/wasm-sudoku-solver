@@ -1,5 +1,5 @@
 use crate::board::{Board, BoardData};
-use crate::types::{PositionalValue, StrResult};
+use crate::types::StrResult;
 use std::collections::HashSet;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -35,6 +35,7 @@ impl AnalyzedCell {
 pub type AnalyzedBoardData = BoardData<AnalyzedCell>;
 pub type AnalyzedBoard = Board<AnalyzedCell>;
 
+#[derive(Debug, Clone)]
 struct BoardPosition {
     pub row: usize,
     pub col: usize,
@@ -42,8 +43,12 @@ struct BoardPosition {
 }
 
 fn get_single_repeating_values(cells: &Vec<AnalyzedCell>) -> Vec<(usize, usize)> {
+    if cells.iter().all(|cell| cell.is_value()) {
+        return vec![];
+    }
+
     let flatten_options = cells.iter().flat_map(|a| match a {
-        AnalyzedCell::Value(v) => vec![*v],
+        AnalyzedCell::Value(_) => vec![],
         AnalyzedCell::Undetermined(opt) => opt.to_vec(),
     });
 
@@ -72,8 +77,7 @@ fn infer_square_reduction_all(analyzed_board: &AnalyzedBoard) -> Vec<BoardPositi
 
     (0..square_size)
         .flat_map(move |row| {
-            (0..square_size)
-                .flat_map(move |col| infer_square_reduction(analyzed_board, row,col))
+            (0..square_size).flat_map(move |col| infer_square_reduction(analyzed_board, row, col))
         })
         .collect()
 }
@@ -122,65 +126,6 @@ fn infer_col_reduction(cols: &Vec<AnalyzedCell>, index: usize) -> Vec<BoardPosit
             value,
         })
         .collect()
-}
-
-fn update_partial_analyzed_board(board: &mut AnalyzedBoard, row: usize, col: usize) -> bool {
-    let square_opt = board.get_square(row, col);
-    let rows_opt = board.get_row(row);
-    let cols_opt = board.get_col(col);
-    let mut has_changed = false;
-
-    if cols_opt.is_none() || rows_opt.is_none() || square_opt.is_none() {
-        return false;
-    }
-
-    let rows = rows_opt.unwrap();
-    let cols = cols_opt.unwrap();
-    let square = square_opt.unwrap();
-
-    has_changed
-}
-
-fn update_analyzed_board(board: &mut AnalyzedBoard) -> bool {
-    let mut changed = false;
-    let size = board.get_size();
-
-    for row in 0..size {
-        for col in 0..size {
-            let current = board.at(row, col).unwrap();
-            if current.is_undetermined() {
-                let mut new_options = HashSet::<usize>::from_iter(1..=size);
-                let current_options = current.get_undetermined().unwrap();
-                let groups = vec![
-                    board.get_row(row).unwrap(),
-                    board.get_col(row).unwrap(),
-                    board.get_square_1d(row).unwrap(),
-                ];
-
-                for &arr in groups.iter() {
-                    for cell in arr {
-                        if cell.is_value() {
-                            let cell_value = &cell.get_value().unwrap();
-                            new_options.remove(cell_value);
-                        }
-                    }
-                }
-
-                if new_options.len() < current_options.len() {
-                    let value: AnalyzedCell = if new_options.len() == 1 {
-                        AnalyzedCell::Value(*(new_options.get(&0).unwrap()))
-                    } else {
-                        AnalyzedCell::Undetermined(Vec::from_iter(new_options))
-                    };
-
-                    board.set(row, col, value);
-                    changed = true;
-                }
-            }
-        }
-    }
-
-    changed
 }
 
 pub fn is_full_board(board: &AnalyzedBoard) -> bool {
