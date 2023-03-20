@@ -155,7 +155,7 @@ pub mod analyze_suite {
 pub mod infer_suite {
     use crate::analyze::{analyze_board, AnalyzedCell};
     use crate::board::Board;
-    use crate::infer::{BoardPosition, infer_row_reduction, infer_square_reduction, uniq_positions};
+    use crate::infer::{BoardPosition, infer_square_reduction, uniq_positions};
 
 
     #[test]
