@@ -2,6 +2,7 @@ use crate::board::{Board, BoardData};
 use crate::types::StrResult;
 use std::collections::HashSet;
 
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum AnalyzedCell {
     Value(usize),
@@ -103,6 +104,9 @@ pub fn recalculate_cell(board: &AnalyzedBoard, row: usize, col: usize) -> StrRes
         .map(|x| *x)
         .collect();
 
+    if options.len() == 0 {
+        return Err(format!("Invalid cell at ({row},{col})"))
+    }
 
     if options.len() == 1{
         let value = options.get(0).unwrap();
