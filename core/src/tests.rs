@@ -120,8 +120,8 @@ pub mod board_suite {
 
 #[cfg(test)]
 pub mod analyze_suite {
-    use crate::analyze::{analyze_board, analyze_cell, AnalyzedCell};
-    use crate::board::Board;
+    use crate::analyze::{analyze_board, analyze_cell, AnalyzedCell, to_board};
+    use crate::board::{Board, BoardData};
 
     #[test]
     fn determine_value() {
@@ -135,7 +135,67 @@ pub mod analyze_suite {
     }
 
     #[test]
-    fn analyze_board_with_square_inferring() {
+    fn convert_to_board() {
+        let board_data: BoardData<usize> = vec![vec![6; 9]; 9];
+        let board = Board::from(&board_data).expect("Failed to create board");
+        let analyzed_board = analyze_board(&board).expect("Failed to analyze board");
+        let new_board = to_board(&analyzed_board).expect("Failed to run to_board");
+        assert_eq!(new_board.get_rows(), &board_data);
+    }
+
+    #[test]
+    fn fail_to_board() {
+        let empty_board = Board::new(9).expect("Failed to create board");
+        let analyzed_board = analyze_board(&empty_board).expect("Failed to analyze board");
+        assert!(to_board(&analyzed_board).is_err());
+    }
+}
+
+#[cfg(test)]
+pub mod infer_suite {
+    use crate::analyze::{analyze_board, AnalyzedCell};
+    use crate::board::Board;
+    use crate::infer::{BoardPosition, infer_row_reduction, infer_square_reduction, uniq_positions};
+
+
+    #[test]
+    fn uniq_positions_work() {
+        let positions = vec![
+            BoardPosition {
+                row: 0,
+                col: 1,
+                value: 0,
+            },
+            BoardPosition {
+                row: 0,
+                col: 0,
+                value: 1,
+            },
+            BoardPosition {
+                row: 0,
+                col: 1,
+                value: 3,
+            },
+        ];
+
+        let uniq = uniq_positions(&positions, None);
+
+        assert_eq!(uniq.get(0).unwrap(), &BoardPosition {
+            row: 0,
+            col: 0,
+            value: 1,
+        });
+
+        assert_eq!(uniq.get(1).unwrap(), &BoardPosition {
+            row: 0,
+            col: 1,
+            value: 0,
+        });
+    }
+
+
+    #[test]
+    fn square_inferring() {
         let mut board = Board::new(9).expect("Could not create board");
         board.set(5, 0, 6);
         board.set(8, 1, 6);
@@ -164,33 +224,52 @@ pub mod analyze_suite {
         +---+---+---+---+---+---+---+---+---+
         */
 
-        let analyzed = analyze_board(&board).expect("could not analyze board");
+        let mut analyzed = analyze_board(&board).expect("could not analyze board");
+
+        infer_square_reduction(&analyzed, 0, 0)
+            .into_iter()
+            .for_each(|BoardPosition { row, col, value }| {
+                analyzed.set(row, col, AnalyzedCell::Value(value));
+            });
 
         assert_eq!(analyzed.at(1, 2).unwrap(), &AnalyzedCell::Value(6));
+    }
+
+    #[test]
+    fn update_board_after_creation() {
+        let mut board = Board::new(4).expect("Could not create board");
+        board.set(1, 1, 1);
+        board.set(1, 3, 3);
+        board.set(0, 2, 2);
+
+        /*
+        Must infer X is 2 due to row inferring
+        +---+---+---+---+
+        | 0 | 0 | 2 | 0 |
+        +---+---+---+---+
+        | Y | 1 | X | 3 |
+        +---+---+---+---+
+        | 0 | 0 | 0 | 0 |
+        +---+---+---+---+
+        | 0 | 0 | 0 | 0 |
+        +---+---+---+---+
+
+        Should be:
+        X = 4, Y =  2
+         */
+
+        let analyzed = analyze_board(&board).expect("Could not analyze board");
+
+        let x = analyzed.at(1, 2).unwrap();
+        let y = analyzed.at(1, 0).unwrap();
+
+        assert_eq!(x.get_value(), Some(4));
+        assert_eq!(y.get_value(), Some(2));
     }
 }
 
 #[cfg(test)]
-pub mod solve_suite {
-    use crate::analyze::{analyze_board, to_board};
-    use crate::board::{Board, BoardData};
-
-    #[test]
-    fn convert_to_board() {
-        let board_data: BoardData<usize> = vec![vec![6; 9]; 9];
-        let board = Board::from(&board_data).expect("Failed to create board");
-        let analyzed_board = analyze_board(&board).expect("Failed to analyze board");
-        let new_board = to_board(&analyzed_board).expect("Failed to run to_board");
-        assert_eq!(new_board.get_rows(), &board_data);
-    }
-
-    #[test]
-    fn fail_to_board() {
-        let empty_board = Board::new(9).expect("Failed to create board");
-        let analyzed_board = analyze_board(&empty_board).expect("Failed to analyze board");
-        assert!(to_board(&analyzed_board).is_err());
-    }
-}
+pub mod solve_suite {}
 
 #[cfg(test)]
 pub mod my_tests {

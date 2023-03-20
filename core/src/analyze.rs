@@ -35,99 +35,6 @@ impl AnalyzedCell {
 pub type AnalyzedBoardData = BoardData<AnalyzedCell>;
 pub type AnalyzedBoard = Board<AnalyzedCell>;
 
-#[derive(Debug, Clone)]
-struct BoardPosition {
-    pub row: usize,
-    pub col: usize,
-    pub value: usize,
-}
-
-fn get_single_repeating_values(cells: &Vec<AnalyzedCell>) -> Vec<(usize, usize)> {
-    if cells.iter().all(|cell| cell.is_value()) {
-        return vec![];
-    }
-
-    let flatten_options = cells.iter().flat_map(|a| match a {
-        AnalyzedCell::Value(_) => vec![],
-        AnalyzedCell::Undetermined(opt) => opt.to_vec(),
-    });
-
-    flatten_options
-        .clone()
-        .collect::<HashSet<usize>>()
-        .into_iter()
-        .filter(|&x| flatten_options.clone().filter(|&x1| x == x1).count() == 1)
-        .map(|single_value| {
-            let chosen_index = cells
-                .iter()
-                .position(|cell| {
-                    if let AnalyzedCell::Undetermined(options) = cell {
-                        return options.iter().find(|&&opt| opt == single_value).is_some();
-                    }
-                    false
-                })
-                .unwrap();
-            return (chosen_index, single_value);
-        })
-        .collect()
-}
-
-fn infer_square_reduction_all(analyzed_board: &AnalyzedBoard) -> Vec<BoardPosition> {
-    let square_size = analyzed_board.get_square_size();
-
-    (0..square_size)
-        .flat_map(move |row| {
-            (0..square_size).flat_map(move |col| infer_square_reduction(analyzed_board, row, col))
-        })
-        .collect()
-}
-
-fn infer_square_reduction(
-    board: &AnalyzedBoard,
-    square_row: usize,
-    square_col: usize,
-) -> Vec<BoardPosition> {
-    let square = board.get_square(square_row, square_col);
-    let square_size = board.get_square_size();
-
-    if square.is_none() {
-        return vec![];
-    }
-
-    return get_single_repeating_values(square.unwrap())
-        .into_iter()
-        .map(|(index, value)| {
-            let inner_row = index / square_size;
-            let inner_col = index % square_size;
-            let row = square_row * square_size + inner_row;
-            let col = square_col * square_size + inner_col;
-            return BoardPosition { row, col, value };
-        })
-        .collect();
-}
-
-fn infer_row_reduction(rows: &Vec<AnalyzedCell>, index: usize) -> Vec<BoardPosition> {
-    get_single_repeating_values(rows)
-        .into_iter()
-        .map(|(curr_index, value)| BoardPosition {
-            row: index,
-            col: curr_index,
-            value,
-        })
-        .collect()
-}
-
-fn infer_col_reduction(cols: &Vec<AnalyzedCell>, index: usize) -> Vec<BoardPosition> {
-    get_single_repeating_values(cols)
-        .into_iter()
-        .map(|(curr_index, value)| BoardPosition {
-            col: index,
-            row: curr_index,
-            value,
-        })
-        .collect()
-}
-
 pub fn is_full_board(board: &AnalyzedBoard) -> bool {
     board
         .get_rows_flat()
@@ -163,6 +70,82 @@ pub fn to_board(analyzed_board: &AnalyzedBoard) -> StrResult<Board> {
         .collect();
 
     Board::from(&data)
+}
+
+pub fn recalculate_cell(board: &AnalyzedBoard, row: usize, col: usize) -> StrResult<Option<AnalyzedCell>> {
+    let size = board.get_size();
+
+    if row >= size || col >= size {
+        return Err(format!("Index out of bounds: ({row}, {col})"));
+    }
+
+    let cell = board.at(row, col).unwrap();
+
+    // we don't mess with values we already defined.
+    if cell.is_value() {
+        return Ok(None);
+    }
+
+    let rows = board.get_row(row).unwrap();
+    let cols = board.get_col(col).unwrap();
+    let square = board.get_square_of(row, col).unwrap();
+
+    let known: HashSet<usize> = rows
+        .iter()
+        .chain(cols.iter())
+        .chain(square.iter())
+        .filter(|x| x.is_value())
+        .map(|x| x.get_value().unwrap())
+        .collect();
+
+    let options: Vec<usize> = HashSet::<usize>::from_iter(1..=size)
+        .difference(&known)
+        .map(|x| *x)
+        .collect();
+
+
+    if options.len() == 1{
+        let value = options.get(0).unwrap();
+        return Ok(Some(AnalyzedCell::Value(*value)));
+    }
+
+    Ok(Some(AnalyzedCell::Undetermined(options)))
+}
+
+pub fn update_axis(board: &mut AnalyzedBoard, row: usize, col: usize) -> StrResult<Vec<(usize, usize)>> {
+    let size = board.get_size();
+    let mut changed_cells: Vec<(usize, usize)> = vec![];
+
+    // updating row and col axis
+    for x in 0..size {
+        for (_row, _col) in vec![(row, x), (x, col)] {
+            let item = recalculate_cell(board, _row, _col)?;
+
+            if item.is_some(){
+                board.set(_row, _col, item.unwrap());
+                changed_cells.push((_row, _col));
+            }
+        }
+    }
+
+    // updating square
+    let square_size = board.get_square_size();
+    let square_row = row / square_size;
+    let square_col = col / square_size;
+
+    for i in 0..square_size {
+        for j in 0..square_size {
+            let curr_row = square_row + i;
+            let curr_col = square_col + j;
+            let item = recalculate_cell(board, curr_row, curr_col)?;
+            if item.is_some() {
+                board.set(curr_row, curr_col, item.unwrap());
+                changed_cells.push((curr_row, curr_col));
+            }
+        }
+    }
+
+    Ok(changed_cells)
 }
 
 pub fn analyze_cell(board: &Board, row: usize, col: usize) -> Option<AnalyzedCell> {
@@ -218,6 +201,7 @@ pub fn analyze_board(board: &Board) -> Option<AnalyzedBoard> {
         let mut row_list: Vec<AnalyzedCell> = vec![];
         for col in 0..size {
             let cell = analyze_cell(board, row, col)?;
+
             row_list.push(cell);
         }
         board_size_data.push(row_list);
@@ -225,11 +209,11 @@ pub fn analyze_board(board: &Board) -> Option<AnalyzedBoard> {
 
     let mut analyzed_board = Board::from(&board_size_data).ok()?;
 
-    infer_square_reduction_all(&analyzed_board)
-        .into_iter()
-        .for_each(|x| {
-            analyzed_board.set(x.row, x.col, AnalyzedCell::Value(x.value));
-        });
+    //update board
+    for x in 0..size{
+        update_axis(&mut analyzed_board, x, x).ok()?;
+    }
 
     return Some(analyzed_board);
 }
+
