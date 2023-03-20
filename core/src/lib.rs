@@ -4,3 +4,4 @@ mod solve;
 mod tests;
 mod types;
 mod validators;
+mod infer;
