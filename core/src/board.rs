@@ -127,7 +127,7 @@ where
 
     pub fn get_square(&self, row: usize, col: usize) -> Option<&Vec<T>> {
         let square_size = self.get_square_size();
-        let square_position = row / square_size * square_size + col / square_size;
+        let square_position = row * square_size + col;
         self.squares.get(square_position)
     }
 

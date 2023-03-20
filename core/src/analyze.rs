@@ -1,6 +1,7 @@
 use crate::board::{Board, BoardData};
 use crate::types::StrResult;
 use std::collections::HashSet;
+use crate::infer::BoardPosition;
 
 
 #[derive(Debug, Clone, PartialEq)]
@@ -105,10 +106,10 @@ pub fn recalculate_cell(board: &AnalyzedBoard, row: usize, col: usize) -> StrRes
         .collect();
 
     if options.len() == 0 {
-        return Err(format!("Invalid cell at ({row},{col})"))
+        return Err(format!("Invalid cell at ({row},{col})"));
     }
 
-    if options.len() == 1{
+    if options.len() == 1 {
         let value = options.get(0).unwrap();
         return Ok(Some(AnalyzedCell::Value(*value)));
     }
@@ -125,7 +126,7 @@ pub fn update_axis(board: &mut AnalyzedBoard, row: usize, col: usize) -> StrResu
         for (_row, _col) in vec![(row, x), (x, col)] {
             let item = recalculate_cell(board, _row, _col)?;
 
-            if item.is_some(){
+            if item.is_some() {
                 board.set(_row, _col, item.unwrap());
                 changed_cells.push((_row, _col));
             }
@@ -152,22 +153,39 @@ pub fn update_axis(board: &mut AnalyzedBoard, row: usize, col: usize) -> StrResu
     Ok(changed_cells)
 }
 
-pub fn analyze_cell(board: &Board, row: usize, col: usize) -> Option<AnalyzedCell> {
-    let value_ref = board.at(row, col)?;
+pub fn update_board(board: &mut AnalyzedBoard) -> StrResult<Vec<(usize, usize)>> {
+    let size = board.get_size();
+    let mut updated_positions = Vec::<(usize, usize)>::new();
+
+    for row in 0..size {
+        for col in 0..size {
+            let new_cell = recalculate_cell(board, row, col)?;
+
+            if new_cell.is_some() {
+                updated_positions.push((row, col));
+            }
+        }
+    }
+
+    Ok(updated_positions)
+}
+
+pub fn analyze_cell(board: &Board, row: usize, col: usize) -> StrResult<AnalyzedCell> {
+    let value_ref = board.at(row, col).ok_or(format!("could not get cell of ({row},{col})"))?;
     let value = *value_ref;
 
     if value > board.get_size() {
-        return None;
+        return Err(format!("Value of {value} in ({row},{col}) is not valid: Too big"));
     }
 
     if value > 0 {
-        return Some(AnalyzedCell::Value(value));
+        return Ok(AnalyzedCell::Value(value));
     }
 
     let size = board.get_size();
-    let row_list = board.get_row(row)?;
-    let col_list = board.get_col(col)?;
-    let square_list = board.get_square(row, col)?;
+    let row_list = board.get_row(row).ok_or(format!("Could not get row of {row}"))?;
+    let col_list = board.get_col(col).ok_or(format!("Could not get col of {col}"))?;
+    let square_list = board.get_square_of(row, col).ok_or(format!("Could not get square_of ({row},{col})"))?;
 
     let mut all_axis_options: Vec<usize> = Vec::new();
     let all_options: HashSet<usize> = (1..=size).collect::<HashSet<_>>();
@@ -187,17 +205,17 @@ pub fn analyze_cell(board: &Board, row: usize, col: usize) -> Option<AnalyzedCel
         .collect::<Vec<_>>();
 
     if possible_options.len() == 0 {
-        return None;
+        return Err(format!("cell ({row},{col}) has no options left, hence invalid"));
     }
 
     if possible_options.len() == 1 {
-        return Some(AnalyzedCell::Value(possible_options[0]));
+        return Ok(AnalyzedCell::Value(possible_options[0]));
     }
 
-    Some(AnalyzedCell::Undetermined(possible_options))
+    Ok(AnalyzedCell::Undetermined(possible_options))
 }
 
-pub fn analyze_board(board: &Board) -> Option<AnalyzedBoard> {
+pub fn analyze_board(board: &Board) -> StrResult<AnalyzedBoard> {
     let size = board.get_size();
     let mut board_size_data: AnalyzedBoardData = vec![];
 
@@ -211,13 +229,10 @@ pub fn analyze_board(board: &Board) -> Option<AnalyzedBoard> {
         board_size_data.push(row_list);
     }
 
-    let mut analyzed_board = Board::from(&board_size_data).ok()?;
+    let mut analyzed_board = Board::from(&board_size_data)?;
 
-    //update board
-    for x in 0..size{
-        update_axis(&mut analyzed_board, x, x).ok()?;
-    }
+    update_board(&mut analyzed_board)?;
 
-    return Some(analyzed_board);
+    return Ok(analyzed_board);
 }
 

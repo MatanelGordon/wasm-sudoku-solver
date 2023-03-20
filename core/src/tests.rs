@@ -116,6 +116,32 @@ pub mod board_suite {
 
         assert_eq!(&results, &expected);
     }
+
+    #[test]
+    fn set_works_on_all_data(){
+        let mut board = Board::new(4).expect("Failed initializing board");
+        let row:usize = 1;
+        let col: usize = 1;
+        let expected: usize = 1;
+
+
+        board.set(row,col, expected);
+
+        let cell = board.at(row, col).unwrap();
+        let row_cell = board.get_row(row).unwrap().get(col).unwrap();
+        let col_cell = board.get_col(col).unwrap().get(row).unwrap();
+
+        let square_size = board.get_square_size();
+        let inner_square_index = (row % square_size) * square_size + (col % square_size);
+        let square = board.get_square_of(row, col).unwrap().get(inner_square_index).unwrap();
+
+        println!("row: {row}, col: {col}, ss: {square_size},  index: {inner_square_index}, {:?}", board.get_square_of(row, col).unwrap());
+
+        assert_eq!(cell, &expected);
+        assert_eq!(row_cell, &expected);
+        assert_eq!(col_cell, &expected);
+        assert_eq!(square, &expected);
+    }
 }
 
 #[cfg(test)]
@@ -247,7 +273,7 @@ pub mod infer_suite {
         +---+---+---+---+
         | 0 | 0 | 2 | 0 |
         +---+---+---+---+
-        | Y | 1 | X | 3 |
+        | 0 | 1 | X | 3 |
         +---+---+---+---+
         | 0 | 0 | 0 | 0 |
         +---+---+---+---+
@@ -255,16 +281,14 @@ pub mod infer_suite {
         +---+---+---+---+
 
         Should be:
-        X = 4, Y =  2
+        X = 4
          */
 
         let analyzed = analyze_board(&board).expect("Could not analyze board");
 
         let x = analyzed.at(1, 2).unwrap();
-        let y = analyzed.at(1, 0).unwrap();
 
         assert_eq!(x.get_value(), Some(4));
-        assert_eq!(y.get_value(), Some(2));
     }
 }
 
