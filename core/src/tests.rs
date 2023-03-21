@@ -175,6 +175,37 @@ pub mod analyze_suite {
         let analyzed_board = analyze_board(&empty_board).expect("Failed to analyze board");
         assert!(to_board(&analyzed_board).is_err());
     }
+
+
+    #[test]
+    fn update_board_after_creation() {
+        let mut board = Board::new(4).expect("Could not create board");
+        board.set(1, 1, 1);
+        board.set(1, 3, 3);
+        board.set(0, 2, 2);
+
+        /*
+        Must infer X is 2 due to row inferring
+        +---+---+---+---+
+        | 0 | 0 | 2 | 0 |
+        +---+---+---+---+
+        | 0 | 1 | X | 3 |
+        +---+---+---+---+
+        | 0 | 0 | 0 | 0 |
+        +---+---+---+---+
+        | 0 | 0 | 0 | 0 |
+        +---+---+---+---+
+
+        Should be:
+        X = 4
+         */
+
+        let analyzed = analyze_board(&board).expect("Could not analyze board");
+
+        let x = analyzed.at(1, 2).unwrap();
+
+        assert_eq!(x.get_value(), Some(4));
+    }
 }
 
 #[cfg(test)]
@@ -259,36 +290,6 @@ pub mod infer_suite {
             });
 
         assert_eq!(analyzed.at(1, 2).unwrap(), &AnalyzedCell::Value(6));
-    }
-
-    #[test]
-    fn update_board_after_creation() {
-        let mut board = Board::new(4).expect("Could not create board");
-        board.set(1, 1, 1);
-        board.set(1, 3, 3);
-        board.set(0, 2, 2);
-
-        /*
-        Must infer X is 2 due to row inferring
-        +---+---+---+---+
-        | 0 | 0 | 2 | 0 |
-        +---+---+---+---+
-        | 0 | 1 | X | 3 |
-        +---+---+---+---+
-        | 0 | 0 | 0 | 0 |
-        +---+---+---+---+
-        | 0 | 0 | 0 | 0 |
-        +---+---+---+---+
-
-        Should be:
-        X = 4
-         */
-
-        let analyzed = analyze_board(&board).expect("Could not analyze board");
-
-        let x = analyzed.at(1, 2).unwrap();
-
-        assert_eq!(x.get_value(), Some(4));
     }
 }
 
