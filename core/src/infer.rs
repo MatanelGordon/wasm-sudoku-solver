@@ -1,11 +1,15 @@
-use std::collections::HashSet;
 use crate::analyze::{AnalyzedBoard, AnalyzedCell};
+use std::collections::HashSet;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct BoardPosition {
     pub row: usize,
     pub col: usize,
     pub value: usize,
+}
+
+fn is_same_position<'a>(a: &'a BoardPosition, b: &'a BoardPosition) -> bool {
+    return a.row == b.row && a.col == b.col;
 }
 
 fn get_single_repeating_values(cells: &Vec<AnalyzedCell>) -> Vec<(usize, usize)> {
@@ -38,11 +42,28 @@ fn get_single_repeating_values(cells: &Vec<AnalyzedCell>) -> Vec<(usize, usize)>
         .collect()
 }
 
+pub fn is_valid_infer(positions: &Vec<BoardPosition>) -> bool {
+    positions
+        .iter()
+        .find(|pos| {
+            positions
+                .iter()
+                .filter(|pos1| is_same_position(pos, pos1))
+                .count()
+                > 1
+        })
+        .is_none()
+}
+
 pub fn uniq_positions(arr: &Vec<BoardPosition>, size: Option<usize>) -> Vec<BoardPosition> {
     let mut cloned = arr.to_vec();
 
-    cloned.sort_by(|a,b| ((a.row as isize - b.row as isize)*size.unwrap_or(10) as isize + a.col as isize - b.col as isize).cmp(&0));
-    cloned.dedup_by(|a,b| a.row == b.row && a.col == b.col);
+    cloned.sort_by(|a, b| {
+        ((a.row as isize - b.row as isize) * size.unwrap_or(10) as isize + a.col as isize
+            - b.col as isize)
+            .cmp(&0)
+    });
+    cloned.dedup_by(|a, b| a.row == b.row && a.col == b.col);
 
     cloned
 }
@@ -107,7 +128,7 @@ pub fn infer_axis_reduction(analyzed_board: &AnalyzedBoard) -> Vec<BoardPosition
     let size = analyzed_board.get_size();
     let mut reductions: Vec<BoardPosition> = vec![];
 
-    for x in 0..size{
+    for x in 0..size {
         let cols = analyzed_board.get_col(x).unwrap();
         let rows = analyzed_board.get_row(x).unwrap();
         reductions.extend(infer_col_reduction(cols, x));

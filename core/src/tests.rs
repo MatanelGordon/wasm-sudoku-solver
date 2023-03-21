@@ -217,7 +217,7 @@ pub mod analyze_suite {
 pub mod infer_suite {
     use crate::analyze::{analyze_board, AnalyzedCell};
     use crate::board::Board;
-    use crate::infer::{infer_square_reduction, uniq_positions, BoardPosition};
+    use crate::infer::{infer_square_reduction, is_valid_infer, uniq_positions, BoardPosition};
 
     #[test]
     fn uniq_positions_work() {
@@ -299,6 +299,46 @@ pub mod infer_suite {
             });
 
         assert_eq!(analyzed.at(1, 2).unwrap(), &AnalyzedCell::Value(6));
+    }
+
+    #[test]
+    fn invalid_infer_results() {
+        let invalid_results: Vec<BoardPosition> = vec![
+            BoardPosition {
+                row: 0,
+                col: 0,
+                value: 0,
+            },
+            BoardPosition {
+                row: 0,
+                col: 0,
+                value: 1,
+            },
+        ];
+
+        let is_valid = is_valid_infer(&invalid_results);
+
+        assert_eq!(is_valid, false);
+    }
+
+    #[test]
+    fn valid_infer_results() {
+        let valid_results: Vec<BoardPosition> = vec![
+            BoardPosition {
+                row: 0,
+                col: 1,
+                value: 2,
+            },
+            BoardPosition {
+                row: 1,
+                col: 0,
+                value: 1,
+            },
+        ];
+
+        let is_valid = is_valid_infer(&valid_results);
+
+        assert_eq!(is_valid, true);
     }
 }
 
