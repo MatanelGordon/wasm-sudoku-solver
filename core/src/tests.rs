@@ -118,14 +118,13 @@ pub mod board_suite {
     }
 
     #[test]
-    fn set_works_on_all_data(){
+    fn set_works_on_all_data() {
         let mut board = Board::new(4).expect("Failed initializing board");
-        let row:usize = 1;
+        let row: usize = 1;
         let col: usize = 1;
         let expected: usize = 1;
 
-
-        board.set(row,col, expected);
+        board.set(row, col, expected);
 
         let cell = board.at(row, col).unwrap();
         let row_cell = board.get_row(row).unwrap().get(col).unwrap();
@@ -133,9 +132,16 @@ pub mod board_suite {
 
         let square_size = board.get_square_size();
         let inner_square_index = (row % square_size) * square_size + (col % square_size);
-        let square = board.get_square_of(row, col).unwrap().get(inner_square_index).unwrap();
+        let square = board
+            .get_square_of(row, col)
+            .unwrap()
+            .get(inner_square_index)
+            .unwrap();
 
-        println!("row: {row}, col: {col}, ss: {square_size},  index: {inner_square_index}, {:?}", board.get_square_of(row, col).unwrap());
+        println!(
+            "row: {row}, col: {col}, ss: {square_size},  index: {inner_square_index}, {:?}",
+            board.get_square_of(row, col).unwrap()
+        );
 
         assert_eq!(cell, &expected);
         assert_eq!(row_cell, &expected);
@@ -146,7 +152,7 @@ pub mod board_suite {
 
 #[cfg(test)]
 pub mod analyze_suite {
-    use crate::analyze::{analyze_board, analyze_cell, AnalyzedCell, to_board};
+    use crate::analyze::{analyze_board, analyze_cell, to_board, AnalyzedCell};
     use crate::board::{Board, BoardData};
 
     #[test]
@@ -175,7 +181,6 @@ pub mod analyze_suite {
         let analyzed_board = analyze_board(&empty_board).expect("Failed to analyze board");
         assert!(to_board(&analyzed_board).is_err());
     }
-
 
     #[test]
     fn update_board_after_creation() {
@@ -212,8 +217,7 @@ pub mod analyze_suite {
 pub mod infer_suite {
     use crate::analyze::{analyze_board, AnalyzedCell};
     use crate::board::Board;
-    use crate::infer::{BoardPosition, infer_square_reduction, uniq_positions};
-
+    use crate::infer::{infer_square_reduction, uniq_positions, BoardPosition};
 
     #[test]
     fn uniq_positions_work() {
@@ -237,19 +241,24 @@ pub mod infer_suite {
 
         let uniq = uniq_positions(&positions, None);
 
-        assert_eq!(uniq.get(0).unwrap(), &BoardPosition {
-            row: 0,
-            col: 0,
-            value: 1,
-        });
+        assert_eq!(
+            uniq.get(0).unwrap(),
+            &BoardPosition {
+                row: 0,
+                col: 0,
+                value: 1,
+            }
+        );
 
-        assert_eq!(uniq.get(1).unwrap(), &BoardPosition {
-            row: 0,
-            col: 1,
-            value: 0,
-        });
+        assert_eq!(
+            uniq.get(1).unwrap(),
+            &BoardPosition {
+                row: 0,
+                col: 1,
+                value: 0,
+            }
+        );
     }
-
 
     #[test]
     fn square_inferring() {

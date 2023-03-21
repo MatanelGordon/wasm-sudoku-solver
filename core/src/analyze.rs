@@ -1,8 +1,7 @@
 use crate::board::{Board, BoardData};
+use crate::infer::BoardPosition;
 use crate::types::StrResult;
 use std::collections::HashSet;
-use crate::infer::BoardPosition;
-
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum AnalyzedCell {
@@ -74,7 +73,11 @@ pub fn to_board(analyzed_board: &AnalyzedBoard) -> StrResult<Board> {
     Board::from(&data)
 }
 
-pub fn recalculate_cell(board: &AnalyzedBoard, row: usize, col: usize) -> StrResult<Option<AnalyzedCell>> {
+pub fn recalculate_cell(
+    board: &AnalyzedBoard,
+    row: usize,
+    col: usize,
+) -> StrResult<Option<AnalyzedCell>> {
     let size = board.get_size();
 
     if row >= size || col >= size {
@@ -117,7 +120,11 @@ pub fn recalculate_cell(board: &AnalyzedBoard, row: usize, col: usize) -> StrRes
     Ok(Some(AnalyzedCell::Undetermined(options)))
 }
 
-pub fn update_axis(board: &mut AnalyzedBoard, row: usize, col: usize) -> StrResult<Vec<(usize, usize)>> {
+pub fn update_axis(
+    board: &mut AnalyzedBoard,
+    row: usize,
+    col: usize,
+) -> StrResult<Vec<(usize, usize)>> {
     let size = board.get_size();
     let mut changed_cells: Vec<(usize, usize)> = vec![];
 
@@ -171,11 +178,15 @@ pub fn update_board(board: &mut AnalyzedBoard) -> StrResult<Vec<(usize, usize)>>
 }
 
 pub fn analyze_cell(board: &Board, row: usize, col: usize) -> StrResult<AnalyzedCell> {
-    let value_ref = board.at(row, col).ok_or(format!("could not get cell of ({row},{col})"))?;
+    let value_ref = board
+        .at(row, col)
+        .ok_or(format!("could not get cell of ({row},{col})"))?;
     let value = *value_ref;
 
     if value > board.get_size() {
-        return Err(format!("Value of {value} in ({row},{col}) is not valid: Too big"));
+        return Err(format!(
+            "Value of {value} in ({row},{col}) is not valid: Too big"
+        ));
     }
 
     if value > 0 {
@@ -183,9 +194,15 @@ pub fn analyze_cell(board: &Board, row: usize, col: usize) -> StrResult<Analyzed
     }
 
     let size = board.get_size();
-    let row_list = board.get_row(row).ok_or(format!("Could not get row of {row}"))?;
-    let col_list = board.get_col(col).ok_or(format!("Could not get col of {col}"))?;
-    let square_list = board.get_square_of(row, col).ok_or(format!("Could not get square_of ({row},{col})"))?;
+    let row_list = board
+        .get_row(row)
+        .ok_or(format!("Could not get row of {row}"))?;
+    let col_list = board
+        .get_col(col)
+        .ok_or(format!("Could not get col of {col}"))?;
+    let square_list = board
+        .get_square_of(row, col)
+        .ok_or(format!("Could not get square_of ({row},{col})"))?;
 
     let mut all_axis_options: Vec<usize> = Vec::new();
     let all_options: HashSet<usize> = (1..=size).collect::<HashSet<_>>();
@@ -205,7 +222,9 @@ pub fn analyze_cell(board: &Board, row: usize, col: usize) -> StrResult<Analyzed
         .collect::<Vec<_>>();
 
     if possible_options.len() == 0 {
-        return Err(format!("cell ({row},{col}) has no options left, hence invalid"));
+        return Err(format!(
+            "cell ({row},{col}) has no options left, hence invalid"
+        ));
     }
 
     if possible_options.len() == 1 {
@@ -235,4 +254,3 @@ pub fn analyze_board(board: &Board) -> StrResult<AnalyzedBoard> {
 
     return Ok(analyzed_board);
 }
-
