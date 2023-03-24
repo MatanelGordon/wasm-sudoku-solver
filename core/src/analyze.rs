@@ -3,6 +3,7 @@ use crate::infer::BoardPosition;
 use crate::types::StrResult;
 use crate::update::update_board;
 use std::collections::HashSet;
+use std::fmt::{Display, Formatter};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum AnalyzedCell {
@@ -30,6 +31,15 @@ impl AnalyzedCell {
         match self {
             AnalyzedCell::Value(_) => None,
             AnalyzedCell::Undetermined(values) => Some(values),
+        }
+    }
+}
+
+impl Display for AnalyzedCell {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            AnalyzedCell::Value(v) => write!(f, "{v}"),
+            AnalyzedCell::Undetermined(_) => write!(f, " ")
         }
     }
 }

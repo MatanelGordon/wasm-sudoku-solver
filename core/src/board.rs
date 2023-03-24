@@ -1,3 +1,4 @@
+use std::fmt::{Display, Formatter};
 use crate::types::{PositionalValue, StrResult};
 use crate::validators::{is_square, is_square_matrix};
 
@@ -249,5 +250,17 @@ where
             .collect();
 
         Some(col_list)
+    }
+}
+
+impl<T> Display for Board<T> where T:Display {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        for row in self.rows.iter(){
+            for item in row{
+                write!(f, "| {:>2} ", item)?;
+            }
+            writeln!(f, "|")?;
+        }
+        Ok(())
     }
 }
