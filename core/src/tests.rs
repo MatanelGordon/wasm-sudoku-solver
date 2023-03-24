@@ -347,13 +347,42 @@ pub mod solve_suite {}
 
 #[cfg(test)]
 pub mod my_tests {
-    use rand::Rng;
+    use crate::analyze::analyze_board;
+    use crate::board::Board;
+    use crate::update::update_board;
 
     #[test]
     fn main_test() {
-        let mut rng = rand::thread_rng();
+        let mut board = Board::new(9).expect("Could not create board");
 
-        let n1: usize = rng.gen();
-        println!("Hello there {n1}");
+        board.set(0, 0, 4);
+        board.set(0, 3, 9);
+        board.set(1, 2, 1);
+        board.set(1, 4, 7);
+        board.set(1, 7, 6);
+        board.set(2, 3, 1);
+        board.set(2, 7, 3);
+        board.set(3, 1, 4);
+        board.set(3, 5, 2);
+        board.set(3, 8, 5);
+        board.set(4, 2, 5);
+        board.set(4, 3, 6);
+        board.set(4, 6, 8);
+        board.set(4, 7, 4);
+        board.set(5, 1, 7);
+        board.set(5, 6, 9);
+        board.set(6, 1, 2);
+        board.set(6, 4, 1);
+        board.set(6, 8, 3);
+        board.set(7, 0, 5);
+        board.set(7, 2, 3);
+        board.set(7, 4, 8);
+        board.set(7, 6, 6);
+        board.set(8, 0, 6);
+        board.set(8, 7, 1);
+
+        let mut analyzed = analyze_board(&board).expect("Failed analyzing board");
+
+        println!("{}", &analyzed);
     }
 }
