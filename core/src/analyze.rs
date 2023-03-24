@@ -1,6 +1,7 @@
 use crate::board::{Board, BoardData};
 use crate::infer::BoardPosition;
 use crate::types::StrResult;
+use crate::update::update_board;
 use std::collections::HashSet;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -71,110 +72,6 @@ pub fn to_board(analyzed_board: &AnalyzedBoard) -> StrResult<Board> {
         .collect();
 
     Board::from(&data)
-}
-
-pub fn recalculate_cell(
-    board: &AnalyzedBoard,
-    row: usize,
-    col: usize,
-) -> StrResult<Option<AnalyzedCell>> {
-    let size = board.get_size();
-
-    if row >= size || col >= size {
-        return Err(format!("Index out of bounds: ({row}, {col})"));
-    }
-
-    let cell = board.at(row, col).unwrap();
-
-    // we don't mess with values we already defined.
-    if cell.is_value() {
-        return Ok(None);
-    }
-
-    let rows = board.get_row(row).unwrap();
-    let cols = board.get_col(col).unwrap();
-    let square = board.get_square_of(row, col).unwrap();
-
-    let known: HashSet<usize> = rows
-        .iter()
-        .chain(cols.iter())
-        .chain(square.iter())
-        .filter(|x| x.is_value())
-        .map(|x| x.get_value().unwrap())
-        .collect();
-
-    let options: Vec<usize> = HashSet::<usize>::from_iter(1..=size)
-        .difference(&known)
-        .map(|x| *x)
-        .collect();
-
-    if options.len() == 0 {
-        return Err(format!("Invalid cell at ({row},{col})"));
-    }
-
-    if options.len() == 1 {
-        let value = options.get(0).unwrap();
-        return Ok(Some(AnalyzedCell::Value(*value)));
-    }
-
-    Ok(Some(AnalyzedCell::Undetermined(options)))
-}
-
-pub fn update_axis(
-    board: &mut AnalyzedBoard,
-    row: usize,
-    col: usize,
-) -> StrResult<Vec<(usize, usize)>> {
-    let size = board.get_size();
-    let mut changed_cells: Vec<(usize, usize)> = vec![];
-
-    // updating row and col axis
-    for x in 0..size {
-        for (_row, _col) in vec![(row, x), (x, col)] {
-            let item = recalculate_cell(board, _row, _col)?;
-
-            if item.is_some() {
-                board.set(_row, _col, item.unwrap());
-                changed_cells.push((_row, _col));
-            }
-        }
-    }
-
-    // updating square
-    let square_size = board.get_square_size();
-    let square_row = row / square_size;
-    let square_col = col / square_size;
-
-    for i in 0..square_size {
-        for j in 0..square_size {
-            let curr_row = square_row + i;
-            let curr_col = square_col + j;
-            let item = recalculate_cell(board, curr_row, curr_col)?;
-            if item.is_some() {
-                board.set(curr_row, curr_col, item.unwrap());
-                changed_cells.push((curr_row, curr_col));
-            }
-        }
-    }
-
-    Ok(changed_cells)
-}
-
-pub fn update_board(board: &mut AnalyzedBoard) -> StrResult<Vec<(usize, usize)>> {
-    let size = board.get_size();
-    let mut updated_positions = Vec::<(usize, usize)>::new();
-
-    for row in 0..size {
-        for col in 0..size {
-            let new_cell = recalculate_cell(board, row, col)?;
-
-            if new_cell.is_some() {
-                updated_positions.push((row, col));
-            }
-        }
-    }
-
-    Ok(updated_positions)
 }
 
 pub fn analyze_cell(board: &Board, row: usize, col: usize) -> StrResult<AnalyzedCell> {
