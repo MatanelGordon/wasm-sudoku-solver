@@ -137,11 +137,11 @@ where
     }
 
     pub fn get_square_of(&self, row: usize, col: usize) -> Option<&Vec<T>> {
-        let (s_row, s_col) = self.get_square_position_of(row ,col);
+        let (s_row, s_col) = self.get_square_position_of(row, col);
         self.get_square(s_row, s_col)
     }
 
-    pub fn get_square_position_of(&self, row:usize, col:usize) -> (usize, usize){
+    pub fn get_square_position_of(&self, row: usize, col: usize) -> (usize, usize) {
         let square_size = self.get_square_size();
         let s_row = row / square_size;
         let s_col = col / square_size;
