@@ -1,5 +1,4 @@
 use crate::board::{Board, BoardData};
-use crate::infer::BoardPosition;
 use crate::types::StrResult;
 use crate::update::update_board;
 use std::collections::HashSet;
@@ -39,7 +38,7 @@ impl Display for AnalyzedCell {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             AnalyzedCell::Value(v) => write!(f, "{v}"),
-            AnalyzedCell::Undetermined(_) => write!(f, " ")
+            AnalyzedCell::Undetermined(_) => write!(f, " "),
         }
     }
 }

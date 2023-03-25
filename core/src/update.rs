@@ -62,14 +62,17 @@ fn update_position<'a>(
         let value = new_cell.unwrap();
 
         if value.is_value() {
-            println!("Found value: {row},{col} = {:?}", &value);
-            if positions_vec.is_some(){
+            println!(
+                "Found Value in Recalculation: ({row}, {col}) -> {:?}",
+                value
+            );
+            if positions_vec.is_some() {
                 positions_vec.unwrap().push((row, col));
             }
             has_changed = true;
         }
 
-        board.set(row, col, value);
+        board.set(row, col, value)?;
     }
 
     Ok(has_changed)
@@ -130,7 +133,8 @@ pub fn update_board(board: &mut AnalyzedBoard) -> StrResult<Vec<(usize, usize)>>
     Ok(updated_positions)
 }
 
-pub fn update_positions<'a>(
+// update multiple positions using row, col, and square caching
+fn _update_positions<'a>(
     board: &'a mut AnalyzedBoard,
     positions: &'a Vec<(usize, usize)>,
 ) -> StrResult<Vec<(usize, usize)>> {
@@ -167,4 +171,17 @@ pub fn update_positions<'a>(
     changed_positions.dedup_by(|(r1, c1), (r2, c2)| r1 == r2 && c1 == c2);
 
     Ok(changed_positions)
+}
+
+pub fn update_positions<'a>(
+    board: &'a mut AnalyzedBoard,
+    positions: &'a Vec<(usize, usize)>,
+) -> StrResult<()> {
+    let mut curr_positions = positions.to_vec();
+    loop {
+        if curr_positions.len() == 0 {
+            return Ok(());
+        }
+        curr_positions = _update_positions(board, &curr_positions)?;
+    }
 }

@@ -108,7 +108,9 @@ pub mod board_suite {
         ];
 
         for &PositionalValue { row, col, value } in expected.iter() {
-            board.set(row, col, *value).expect("Failed Setting position value");
+            board
+                .set(row, col, *value)
+                .expect("Failed Setting position value");
         }
 
         let mut results = board.filter(|v| v == value);
@@ -146,19 +148,19 @@ pub mod board_suite {
     }
 
     #[test]
-    fn set_throws_err_in_invalid_row(){
+    fn set_throws_err_in_invalid_row() {
         let mut board = Board::new(4).expect("Could not create board");
 
-        let result = board.set(5,1,2);
+        let result = board.set(5, 1, 2);
 
         assert_eq!(result.is_err(), true);
     }
 
     #[test]
-    fn set_throws_err_in_invalid_col(){
+    fn set_throws_err_in_invalid_col() {
         let mut board = Board::new(4).expect("Could not create board");
 
-        let result = board.set(1,10,2);
+        let result = board.set(1, 10, 2);
 
         assert_eq!(result.is_err(), true);
     }
@@ -171,7 +173,7 @@ pub mod analyze_suite {
     use crate::types::StrResult;
 
     #[test]
-    fn determine_value(){
+    fn determine_value() {
         let mut board = Board::new(9).expect("Failed setting up board");
         let row: usize = 2;
         let col: usize = 2;
@@ -230,142 +232,14 @@ pub mod analyze_suite {
 }
 
 #[cfg(test)]
-pub mod infer_suite {
-    use crate::analyze::{analyze_board, AnalyzedCell};
-    use crate::board::Board;
-    use crate::infer::{infer_square_reduction, is_valid_infer, uniq_positions, BoardPosition};
-    use crate::types::StrResult;
-
-    #[test]
-    fn uniq_positions_work() {
-        let positions = vec![
-            BoardPosition {
-                row: 0,
-                col: 1,
-                value: 0,
-            },
-            BoardPosition {
-                row: 0,
-                col: 0,
-                value: 1,
-            },
-            BoardPosition {
-                row: 0,
-                col: 1,
-                value: 3,
-            },
-        ];
-
-        let uniq = uniq_positions(&positions, None);
-
-        assert_eq!(
-            uniq.get(0).unwrap(),
-            &BoardPosition {
-                row: 0,
-                col: 0,
-                value: 1,
-            }
-        );
-
-        assert_eq!(
-            uniq.get(1).unwrap(),
-            &BoardPosition {
-                row: 0,
-                col: 1,
-                value: 0,
-            }
-        );
-    }
-
-    #[test]
-    fn square_inferring() -> StrResult<()>{
-        let mut board = Board::new(9).expect("Could not create board");
-        board.set(5, 0, 6)?;
-        board.set(8, 1, 6)?;
-        board.set(0, 4, 6)?;
-        board.set(2, 7, 6)?;
-        // should infer that (1,2) is 6 using square inferring
-        /*
-        +---+---+---+---+---+---+---+---+---+
-        | 0 | 0 | 0 | 0 | 6 | 0 | 0 | 0 | 0 |
-        +---+---+---+---+---+---+---+---+---+
-        | 0 | 0 | X | 0 | 0 | 0 | 0 | 0 | 0 |
-        +---+---+---+---+---+---+---+---+---+
-        | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 6 | 0 |
-        +---+---+---+---+---+---+---+---+---+
-        | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-        +---+---+---+---+---+---+---+---+---+
-        | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-        +---+---+---+---+---+---+---+---+---+
-        | 6 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-        +---+---+---+---+---+---+---+---+---+
-        | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-        +---+---+---+---+---+---+---+---+---+
-        | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-        +---+---+---+---+---+---+---+---+---+
-        | 0 | 6 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-        +---+---+---+---+---+---+---+---+---+
-        */
-
-        let mut analyzed = analyze_board(&board).expect("could not analyze board");
-
-        infer_square_reduction(&analyzed, 0, 0)
-            .into_iter()
-            .for_each(|BoardPosition { row, col, value }| {
-                analyzed.set(row, col, AnalyzedCell::Value(value)).expect("could not set value");
-            });
-
-        assert_eq!(analyzed.at(1, 2).unwrap(), &AnalyzedCell::Value(6));
-        Ok(())
-    }
-
-    #[test]
-    fn invalid_infer_results() {
-        let invalid_results: Vec<BoardPosition> = vec![
-            BoardPosition {
-                row: 0,
-                col: 0,
-                value: 0,
-            },
-            BoardPosition {
-                row: 0,
-                col: 0,
-                value: 1,
-            },
-        ];
-
-        let is_valid = is_valid_infer(&invalid_results);
-
-        assert_eq!(is_valid, false);
-    }
-
-    #[test]
-    fn valid_infer_results() {
-        let valid_results: Vec<BoardPosition> = vec![
-            BoardPosition {
-                row: 0,
-                col: 1,
-                value: 2,
-            },
-            BoardPosition {
-                row: 1,
-                col: 0,
-                value: 1,
-            },
-        ];
-
-        let is_valid = is_valid_infer(&valid_results);
-
-        assert_eq!(is_valid, true);
-    }
-}
+pub mod infer_suite {}
 
 #[cfg(test)]
 pub mod solve_suite {}
 
 #[cfg(test)]
 pub mod my_tests {
-    use crate::analyze::analyze_board;
+    use crate::analyze::{analyze_board, AnalyzedCell};
     use crate::board::Board;
     use crate::types::StrResult;
     use crate::update::{update_board, update_positions};
@@ -400,23 +274,15 @@ pub mod my_tests {
         board.set(8, 0, 6)?;
         board.set(8, 7, 1)?;
 
-        let mut analyzed = analyze_board(&board).expect("Failed analyzing board");
+        let mut analyzed = analyze_board(&board)?;
         println!("{}", &analyzed);
 
-        let positions = update_board(&mut analyzed).expect("update_board failed");
+        let positions = update_board(&mut analyzed)?;
         println!("positions: {:?}", &positions);
 
         let mut updated_positions: Vec<(usize, usize)> = positions;
 
-        loop {
-            println!("updated positions: {:?}", &updated_positions);
-
-            updated_positions = update_positions(&mut analyzed, &updated_positions).expect("update_positions failed");
-
-            if updated_positions.len() == 0 {
-                break;
-            }
-        }
+        update_positions(&mut analyzed, &updated_positions)?;
 
         println!("{}", &analyzed);
         Ok(())
