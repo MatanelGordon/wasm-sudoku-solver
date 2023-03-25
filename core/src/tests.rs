@@ -178,7 +178,9 @@ pub mod analyze_suite {
         let row: usize = 2;
         let col: usize = 2;
         let value: usize = 4;
-        board.set(row, col, value);
+        board
+            .set(row, col, value)
+            .expect("Could not set in determine_value");
         let analyzed = analyze_cell(&board, row, col).expect("Failed analyzing cell");
         assert_eq!(analyzed, AnalyzedCell::Value(value));
     }
@@ -232,7 +234,56 @@ pub mod analyze_suite {
 }
 
 #[cfg(test)]
-pub mod infer_suite {}
+pub mod infer_suite {
+    use crate::analyze::analyze_board;
+    use crate::board::Board;
+    use crate::infer::{infer_square_of, InferredPosition};
+    use crate::types::StrResult;
+
+    #[test]
+    fn should_infer_square() -> StrResult<()>{
+        //should infer in 0,2 there is 6
+
+        let mut board = Board::new(9)?;
+        let expected = InferredPosition{
+            row: 0,
+            col: 2,
+            value: 6
+        };
+
+        let expected1 = InferredPosition{
+            row:0,
+            col:1,
+            value: 7
+        };
+
+        // setting up to infer (0,2) -> 6
+        {
+            board.set(5,0,6)?;
+            board.set(8,1,6)?;
+            board.set(2,2,1)?;
+            board.set(1,2,2)?;
+        }
+
+        //setting up to infer (0,1) -> 7
+        {
+            board.set(2,7,7)?;
+            board.set(1,5,7)?;
+            board.set(0,0,3)?;
+        }
+
+        let mut analyzed = analyze_board(&board)?;
+
+        let inferred = infer_square_of(&analyzed, 0 ,2);
+
+        assert_eq!(inferred.len(), 2);
+
+        assert_eq!(inferred.first(), Some(&expected));
+        assert_eq!(inferred.get(1), Some(&expected1));
+
+        Ok(())
+    }
+}
 
 #[cfg(test)]
 pub mod solve_suite {}
@@ -241,51 +292,39 @@ pub mod solve_suite {}
 pub mod my_tests {
     use crate::analyze::{analyze_board, AnalyzedCell};
     use crate::board::Board;
+    use crate::solve::simple_solve;
     use crate::types::StrResult;
     use crate::update::{update_board, update_positions};
 
     #[test]
     fn main_test() -> StrResult<()> {
-        let mut board = Board::new(9).expect("Could not create board");
+        let mut board = Board::new(9)?;
+        {
+            board.set(0, 2, 1)?;
+            board.set(1, 6, 1)?;
+            board.set(7, 1, 1)?;
+            board.set(5, 1, 2)?;
+            board.set(6, 3, 3)?;
+            board.set(7, 2, 3)?;
+            board.set(3, 2, 4)?;
+            board.set(4, 3, 4)?;
+            board.set(8, 8, 4)?;
+            board.set(0, 1, 5)?;
+            board.set(4, 8, 5)?;
+            board.set(6, 7, 5)?;
+            board.set(7, 4, 5)?;
+            board.set(0, 4, 7)?;
+            board.set(3, 1, 7)?;
+            board.set(6, 8, 7)?;
+            board.set(1, 3, 8)?;
+            board.set(2, 0, 8)?;
+            board.set(3, 7, 8)?;
+            board.set(2, 4, 9)?;
+            board.set(4, 6, 9)?;
+            board.set(8, 0, 9)?;
+        }
 
-        board.set(0, 0, 4)?;
-        board.set(0, 3, 9)?;
-        board.set(1, 2, 1)?;
-        board.set(1, 4, 7)?;
-        board.set(1, 7, 6)?;
-        board.set(2, 3, 1)?;
-        board.set(2, 7, 3)?;
-        board.set(3, 1, 4)?;
-        board.set(3, 5, 2)?;
-        board.set(3, 8, 5)?;
-        board.set(4, 2, 5)?;
-        board.set(4, 3, 6)?;
-        board.set(4, 6, 8)?;
-        board.set(4, 7, 4)?;
-        board.set(5, 1, 7)?;
-        board.set(5, 6, 9)?;
-        board.set(6, 1, 2)?;
-        board.set(6, 4, 1)?;
-        board.set(6, 8, 3)?;
-        board.set(7, 0, 5)?;
-        board.set(7, 2, 3)?;
-        board.set(7, 4, 8)?;
-        board.set(7, 6, 6)?;
-        board.set(8, 0, 6)?;
-        board.set(8, 7, 1)?;
-
-        let mut analyzed = analyze_board(&board)?;
-        println!("{}", &analyzed);
-
-
-        // let positions = update_board(&mut analyzed)?;
-        // println!("positions: {:?}", &positions);
-        //
-        // let mut updated_positions: Vec<(usize, usize)> = positions;
-        //
-        // update_positions(&mut analyzed, &updated_positions)?;
-        //
-        // println!("{}", &analyzed);
+        let solved = simple_solve(&board)?;
         Ok(())
     }
 }

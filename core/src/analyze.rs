@@ -1,6 +1,6 @@
 use crate::board::{Board, BoardData};
 use crate::types::StrResult;
-use crate::update::update_board;
+use crate::update::{update_board, update_positions};
 use std::collections::HashSet;
 use std::fmt::{Display, Formatter};
 
@@ -156,7 +156,7 @@ pub fn analyze_board(board: &Board) -> StrResult<AnalyzedBoard> {
 
     let mut analyzed_board = Board::from(&board_size_data)?;
 
-    update_board(&mut analyzed_board)?;
-
+    let x = update_board(&mut analyzed_board)?;
+    println!("updated from analysis: \n {:?}", &x);
     return Ok(analyzed_board);
 }

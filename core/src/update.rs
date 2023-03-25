@@ -2,6 +2,17 @@ use crate::analyze::{AnalyzedBoard, AnalyzedCell};
 use crate::types::StrResult;
 use std::collections::HashSet;
 
+fn without_index<T>(iter: &Vec<T>, index: usize) -> Vec<T> where T : Clone
+{
+    iter
+        .iter()
+        .clone()
+        .enumerate()
+        .filter(move |&(i, _)| i != index)
+        .map(|(_, x)| x.clone())
+        .collect()
+}
+
 pub fn recalculate_cell(
     board: &AnalyzedBoard,
     row: usize,
@@ -20,9 +31,19 @@ pub fn recalculate_cell(
         return Ok(None);
     }
 
-    let rows = board.get_row(row).unwrap();
-    let cols = board.get_col(col).unwrap();
-    let square = board.get_square_of(row, col).unwrap();
+    let s_size = board.get_square_size();
+    let rows = without_index(board.get_row(row).unwrap(), row);
+    let cols = without_index(board.get_col(col).unwrap(), col);
+    let square = without_index(
+        board.get_square_of(row, col).unwrap(),
+        (row * s_size + col) / s_size,
+    );
+
+    // println!("-------------({row},{col})-------------");
+    // println!("rows: {:?}", &rows);
+    // println!("cols: {:?}", &cols);
+    // println!("square: {:?}", &square);
+
 
     let known: HashSet<usize> = rows
         .iter()
@@ -119,19 +140,6 @@ pub fn update_axis(
     Ok(changed_cells)
 }
 
-pub fn update_board(board: &mut AnalyzedBoard) -> StrResult<Vec<(usize, usize)>> {
-    let size = board.get_size();
-    let mut updated_positions: Vec<(usize, usize)> = Vec::new();
-
-    for row in 0..size {
-        for col in 0..size {
-            update_position(board, row, col, Some(&mut updated_positions))?;
-        }
-    }
-
-    Ok(updated_positions)
-}
-
 // update multiple positions using row, col, and square caching
 fn _update_positions<'a>(
     board: &'a mut AnalyzedBoard,
@@ -167,6 +175,7 @@ fn _update_positions<'a>(
     changed_positions.sort_by(|&(r1, c1), &(r2, c2)| {
         ((r1 as isize - r2 as isize) * square_size as isize + (c1 as isize - c2 as isize)).cmp(&0)
     });
+
     changed_positions.dedup_by(|(r1, c1), (r2, c2)| r1 == r2 && c1 == c2);
 
     Ok(changed_positions)
@@ -175,12 +184,29 @@ fn _update_positions<'a>(
 pub fn update_positions<'a>(
     board: &'a mut AnalyzedBoard,
     positions: &'a Vec<(usize, usize)>,
-) -> StrResult<()> {
+) -> StrResult<Vec<(usize, usize)>> {
+    let mut all_positions: Vec<(usize, usize)> = Vec::new();
     let mut curr_positions = positions.to_vec();
-    loop {
-        if curr_positions.len() == 0 {
-            return Ok(());
-        }
+
+    while curr_positions.len() > 0 {
         curr_positions = _update_positions(board, &curr_positions)?;
+        all_positions.extend(curr_positions.iter());
     }
+    return Ok(all_positions);
+}
+
+pub fn update_board(board: &mut AnalyzedBoard) -> StrResult<Vec<(usize, usize)>> {
+    let size = board.get_size();
+    let mut updated_positions: Vec<(usize, usize)> = Vec::new();
+
+    for row in 0..size {
+        for col in 0..size {
+            update_position(board, row, col, Some(&mut updated_positions))?;
+        }
+    }
+
+    let inner_updated = update_positions(board, &updated_positions)?;
+    updated_positions.extend(&inner_updated);
+
+    Ok(updated_positions)
 }
