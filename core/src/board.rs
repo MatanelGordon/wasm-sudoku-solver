@@ -178,13 +178,13 @@ where
         Ok(())
     }
 
-    pub fn set_inner_square(&mut self, s_row: usize, s_col: usize, s_index: usize, value: T) {
+    pub fn set_inner_square(&mut self, s_row: usize, s_col: usize, s_index: usize, value: T) -> StrResult<()> {
         let square_size = self.get_square_size();
         let inner_row = s_index / square_size;
         let inner_col = s_index % square_size;
         let row = s_row * square_size + inner_row;
         let col = s_col * square_size + inner_col;
-        self.set(row, col, value);
+        self.set(row, col, value)
     }
 
     pub fn filter<P>(&self, mut predicate: P) -> Vec<PositionalValue<&T>>
@@ -276,7 +276,7 @@ where
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         for row in self.rows.iter() {
             for item in row {
-                write!(f, "| {:>2} ", item)?;
+                write!(f, "| {} ", item)?;
             }
             writeln!(f, "|")?;
         }
