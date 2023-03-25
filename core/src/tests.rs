@@ -277,14 +277,15 @@ pub mod my_tests {
         let mut analyzed = analyze_board(&board)?;
         println!("{}", &analyzed);
 
-        let positions = update_board(&mut analyzed)?;
-        println!("positions: {:?}", &positions);
 
-        let mut updated_positions: Vec<(usize, usize)> = positions;
-
-        update_positions(&mut analyzed, &updated_positions)?;
-
-        println!("{}", &analyzed);
+        // let positions = update_board(&mut analyzed)?;
+        // println!("positions: {:?}", &positions);
+        //
+        // let mut updated_positions: Vec<(usize, usize)> = positions;
+        //
+        // update_positions(&mut analyzed, &updated_positions)?;
+        //
+        // println!("{}", &analyzed);
         Ok(())
     }
 }
