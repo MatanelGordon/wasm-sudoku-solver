@@ -1,6 +1,6 @@
-use std::fmt::{Display, Formatter};
 use crate::types::{PositionalValue, StrResult};
 use crate::validators::{is_square, is_square_matrix};
+use std::fmt::{Display, Formatter};
 
 pub type BoardData<T = usize> = Vec<Vec<T>>;
 
@@ -152,7 +152,7 @@ where
         self.get_rows().iter().flatten().collect()
     }
 
-    pub fn set(&mut self, row: usize, col: usize, value: T)  -> StrResult<()>{
+    pub fn set(&mut self, row: usize, col: usize, value: T) -> StrResult<()> {
         let size = self.get_size();
 
         if row >= size {
@@ -264,10 +264,13 @@ where
     }
 }
 
-impl<T> Display for Board<T> where T:Display {
+impl<T> Display for Board<T>
+where
+    T: Display,
+{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        for row in self.rows.iter(){
-            for item in row{
+        for row in self.rows.iter() {
+            for item in row {
                 write!(f, "| {:>2} ", item)?;
             }
             writeln!(f, "|")?;
