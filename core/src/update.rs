@@ -85,8 +85,7 @@ pub fn update_square_of(
 ) -> StrResult<Vec<(usize, usize)>> {
     // updating square
     let square_size = board.get_square_size();
-    let square_row = row / square_size;
-    let square_col = col / square_size;
+    let (square_row, square_col) = board.get_square_position_of(row, col);
     let mut changed: Vec<(usize, usize)> = Vec::new();
 
     for i in 0..square_size {
