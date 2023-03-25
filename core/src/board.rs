@@ -133,15 +133,19 @@ where
     }
 
     pub fn get_square_1d(&self, index: usize) -> Option<&Vec<T>> {
-        let square_size = self.get_square_size();
-        let row = index / square_size;
-        let col = index % square_size;
-        self.get_square(row, col)
+        self.squares.get(index)
     }
 
     pub fn get_square_of(&self, row: usize, col: usize) -> Option<&Vec<T>> {
+        let (s_row, s_col) = self.get_square_position_of(row ,col);
+        self.get_square(s_row, s_col)
+    }
+
+    pub fn get_square_position_of(&self, row:usize, col:usize) -> (usize, usize){
         let square_size = self.get_square_size();
-        self.get_square(row / square_size, col / square_size)
+        let s_row = row / square_size;
+        let s_col = col / square_size;
+        (s_row, s_col)
     }
 
     pub fn get_rows(&self) -> &BoardData<T> {
@@ -164,7 +168,8 @@ where
         }
 
         let square_size = self.get_square_size();
-        let square_position = row / square_size * square_size + col / square_size;
+        let (s_row, s_col) = self.get_square_position_of(row, col);
+        let square_position = s_row * square_size + s_col;
         let inner_square_index = (row % square_size) * square_size + col % square_size;
 
         self.rows[row][col] = value.clone();
