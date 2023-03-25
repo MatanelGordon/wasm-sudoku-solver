@@ -1,7 +1,7 @@
 #[cfg(test)]
 pub mod board_suite {
     use crate::board::{Board, BoardData};
-    use crate::types::PositionalValue;
+    use crate::types::{PositionalValue, StrResult};
 
     #[test]
     fn create_empty_board() {
@@ -28,16 +28,17 @@ pub mod board_suite {
     }
 
     #[test]
-    fn get_board_at_location() {
-        let mut board = Board::new(4).expect("could not create board1");
+    fn get_board_at_location() -> StrResult<()> {
+        let mut board = Board::new(4).expect("could not create board");
         let row: usize = 1;
         let col: usize = 1;
         let expected: usize = 1;
 
-        board.set(row, col, expected);
+        board.set(row, col, expected)?;
 
         let received = board.at(row, col).expect("could not use at()");
         assert_eq!(*received, expected);
+        Ok(())
     }
 
     #[test]
@@ -74,7 +75,7 @@ pub mod board_suite {
     #[test]
     fn board_invalid_numerical() {
         let mut board = Board::new(4).expect("Failed initializing board");
-        board.set(0, 1, 100);
+        board.set(0, 1, 100).expect("Failed setting value");
         assert!(!board.is_valid_numerical());
     }
 
@@ -107,7 +108,7 @@ pub mod board_suite {
         ];
 
         for &PositionalValue { row, col, value } in expected.iter() {
-            board.set(row, col, *value);
+            board.set(row, col, *value).expect("Failed Setting position value");
         }
 
         let mut results = board.filter(|v| v == value);
@@ -124,7 +125,7 @@ pub mod board_suite {
         let col: usize = 1;
         let expected: usize = 1;
 
-        board.set(row, col, expected);
+        board.set(row, col, expected).expect("Could not set value");
 
         let cell = board.at(row, col).unwrap();
         let row_cell = board.get_row(row).unwrap().get(col).unwrap();
@@ -138,15 +139,28 @@ pub mod board_suite {
             .get(inner_square_index)
             .unwrap();
 
-        println!(
-            "row: {row}, col: {col}, ss: {square_size},  index: {inner_square_index}, {:?}",
-            board.get_square_of(row, col).unwrap()
-        );
-
         assert_eq!(cell, &expected);
         assert_eq!(row_cell, &expected);
         assert_eq!(col_cell, &expected);
         assert_eq!(square, &expected);
+    }
+
+    #[test]
+    fn set_throws_err_in_invalid_row(){
+        let mut board = Board::new(4).expect("Could not create board");
+
+        let result = board.set(5,1,2);
+
+        assert_eq!(result.is_err(), true);
+    }
+
+    #[test]
+    fn set_throws_err_in_invalid_col(){
+        let mut board = Board::new(4).expect("Could not create board");
+
+        let result = board.set(1,10,2);
+
+        assert_eq!(result.is_err(), true);
     }
 }
 
@@ -154,9 +168,10 @@ pub mod board_suite {
 pub mod analyze_suite {
     use crate::analyze::{analyze_board, analyze_cell, to_board, AnalyzedCell};
     use crate::board::{Board, BoardData};
+    use crate::types::StrResult;
 
     #[test]
-    fn determine_value() {
+    fn determine_value(){
         let mut board = Board::new(9).expect("Failed setting up board");
         let row: usize = 2;
         let col: usize = 2;
@@ -183,11 +198,11 @@ pub mod analyze_suite {
     }
 
     #[test]
-    fn update_board_after_creation() {
+    fn update_board_after_creation() -> StrResult<()> {
         let mut board = Board::new(4).expect("Could not create board");
-        board.set(1, 1, 1);
-        board.set(1, 3, 3);
-        board.set(0, 2, 2);
+        board.set(1, 1, 1)?;
+        board.set(1, 3, 3)?;
+        board.set(0, 2, 2)?;
 
         /*
         Must infer X is 2 due to row inferring
@@ -210,6 +225,7 @@ pub mod analyze_suite {
         let x = analyzed.at(1, 2).unwrap();
 
         assert_eq!(x.get_value(), Some(4));
+        Ok(())
     }
 }
 
@@ -218,6 +234,7 @@ pub mod infer_suite {
     use crate::analyze::{analyze_board, AnalyzedCell};
     use crate::board::Board;
     use crate::infer::{infer_square_reduction, is_valid_infer, uniq_positions, BoardPosition};
+    use crate::types::StrResult;
 
     #[test]
     fn uniq_positions_work() {
@@ -261,12 +278,12 @@ pub mod infer_suite {
     }
 
     #[test]
-    fn square_inferring() {
+    fn square_inferring() -> StrResult<()>{
         let mut board = Board::new(9).expect("Could not create board");
-        board.set(5, 0, 6);
-        board.set(8, 1, 6);
-        board.set(0, 4, 6);
-        board.set(2, 7, 6);
+        board.set(5, 0, 6)?;
+        board.set(8, 1, 6)?;
+        board.set(0, 4, 6)?;
+        board.set(2, 7, 6)?;
         // should infer that (1,2) is 6 using square inferring
         /*
         +---+---+---+---+---+---+---+---+---+
@@ -295,10 +312,11 @@ pub mod infer_suite {
         infer_square_reduction(&analyzed, 0, 0)
             .into_iter()
             .for_each(|BoardPosition { row, col, value }| {
-                analyzed.set(row, col, AnalyzedCell::Value(value));
+                analyzed.set(row, col, AnalyzedCell::Value(value)).expect("could not set value");
             });
 
         assert_eq!(analyzed.at(1, 2).unwrap(), &AnalyzedCell::Value(6));
+        Ok(())
     }
 
     #[test]
@@ -349,40 +367,58 @@ pub mod solve_suite {}
 pub mod my_tests {
     use crate::analyze::analyze_board;
     use crate::board::Board;
-    use crate::update::update_board;
+    use crate::types::StrResult;
+    use crate::update::{update_board, update_positions};
 
     #[test]
-    fn main_test() {
+    fn main_test() -> StrResult<()> {
         let mut board = Board::new(9).expect("Could not create board");
 
-        board.set(0, 0, 4);
-        board.set(0, 3, 9);
-        board.set(1, 2, 1);
-        board.set(1, 4, 7);
-        board.set(1, 7, 6);
-        board.set(2, 3, 1);
-        board.set(2, 7, 3);
-        board.set(3, 1, 4);
-        board.set(3, 5, 2);
-        board.set(3, 8, 5);
-        board.set(4, 2, 5);
-        board.set(4, 3, 6);
-        board.set(4, 6, 8);
-        board.set(4, 7, 4);
-        board.set(5, 1, 7);
-        board.set(5, 6, 9);
-        board.set(6, 1, 2);
-        board.set(6, 4, 1);
-        board.set(6, 8, 3);
-        board.set(7, 0, 5);
-        board.set(7, 2, 3);
-        board.set(7, 4, 8);
-        board.set(7, 6, 6);
-        board.set(8, 0, 6);
-        board.set(8, 7, 1);
+        board.set(0, 0, 4)?;
+        board.set(0, 3, 9)?;
+        board.set(1, 2, 1)?;
+        board.set(1, 4, 7)?;
+        board.set(1, 7, 6)?;
+        board.set(2, 3, 1)?;
+        board.set(2, 7, 3)?;
+        board.set(3, 1, 4)?;
+        board.set(3, 5, 2)?;
+        board.set(3, 8, 5)?;
+        board.set(4, 2, 5)?;
+        board.set(4, 3, 6)?;
+        board.set(4, 6, 8)?;
+        board.set(4, 7, 4)?;
+        board.set(5, 1, 7)?;
+        board.set(5, 6, 9)?;
+        board.set(6, 1, 2)?;
+        board.set(6, 4, 1)?;
+        board.set(6, 8, 3)?;
+        board.set(7, 0, 5)?;
+        board.set(7, 2, 3)?;
+        board.set(7, 4, 8)?;
+        board.set(7, 6, 6)?;
+        board.set(8, 0, 6)?;
+        board.set(8, 7, 1)?;
 
         let mut analyzed = analyze_board(&board).expect("Failed analyzing board");
+        println!("{}", &analyzed);
+
+        let positions = update_board(&mut analyzed).expect("update_board failed");
+        println!("positions: {:?}", &positions);
+
+        let mut updated_positions: Vec<(usize, usize)> = positions;
+
+        loop {
+            println!("updated positions: {:?}", &updated_positions);
+
+            updated_positions = update_positions(&mut analyzed, &updated_positions).expect("update_positions failed");
+
+            if updated_positions.len() == 0 {
+                break;
+            }
+        }
 
         println!("{}", &analyzed);
+        Ok(())
     }
 }

@@ -152,7 +152,17 @@ where
         self.get_rows().iter().flatten().collect()
     }
 
-    pub fn set(&mut self, row: usize, col: usize, value: T) {
+    pub fn set(&mut self, row: usize, col: usize, value: T)  -> StrResult<()>{
+        let size = self.get_size();
+
+        if row >= size {
+            return Err(format!("invalid row set `{row}` in ({row}, {col})"));
+        }
+
+        if col >= size {
+            return Err(format!("invalid col set `{col}` in ({row}, {col})"));
+        }
+
         let square_size = self.get_square_size();
         let square_position = row / square_size * square_size + col / square_size;
         let inner_square_index = (row % square_size) * square_size + col % square_size;
@@ -160,6 +170,7 @@ where
         self.rows[row][col] = value.clone();
         self.cols[col][row] = value.clone();
         self.squares[square_position][inner_square_index] = value.clone();
+        Ok(())
     }
 
     pub fn set_inner_square(&mut self, s_row: usize, s_col: usize, s_index: usize, value: T) {

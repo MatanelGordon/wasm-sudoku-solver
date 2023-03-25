@@ -49,7 +49,33 @@ pub fn recalculate_cell(
     Ok(Some(AnalyzedCell::Undetermined(options)))
 }
 
-pub fn update_square(
+fn update_position<'a>(
+    board: &'a mut AnalyzedBoard,
+    row: usize,
+    col: usize,
+    positions_vec: Option<&'a mut Vec<(usize, usize)>>,
+) -> StrResult<bool> {
+    let new_cell = recalculate_cell(board, row, col)?;
+    let mut has_changed = false;
+
+    if new_cell.is_some() {
+        let value = new_cell.unwrap();
+
+        if value.is_value() {
+            println!("Found value: {row},{col} = {:?}", &value);
+            if positions_vec.is_some(){
+                positions_vec.unwrap().push((row, col));
+            }
+            has_changed = true;
+        }
+
+        board.set(row, col, value);
+    }
+
+    Ok(has_changed)
+}
+
+pub fn update_square_of(
     board: &mut AnalyzedBoard,
     row: usize,
     col: usize,
@@ -64,35 +90,11 @@ pub fn update_square(
         for j in 0..square_size {
             let curr_row = square_row + i;
             let curr_col = square_col + j;
-            update_position(board, curr_row, curr_col, &mut changed)?;
+            update_position(board, curr_row, curr_col, Some(&mut changed))?;
         }
     }
 
     Ok(changed)
-}
-
-fn update_position<'a>(
-    board: &'a mut AnalyzedBoard,
-    row: usize,
-    col: usize,
-    positions_vec: &'a mut Vec<(usize, usize)>,
-) -> StrResult<bool> {
-    let new_cell = recalculate_cell(board, row, col)?;
-    let mut has_changed = false;
-
-    if new_cell.is_some() {
-        let value = new_cell.unwrap();
-
-        if value.is_value() {
-            println!("Found value: {row},{col} = {:?}", &value);
-            positions_vec.push((row, col));
-            has_changed = true;
-        }
-
-        board.set(row, col, value);
-    }
-
-    Ok(has_changed)
 }
 
 pub fn update_axis(
@@ -106,9 +108,9 @@ pub fn update_axis(
     // updating either row / col
     for x in 0..size {
         if is_row {
-            update_position(board, axis, x, &mut changed_cells)?;
+            update_position(board, axis, x, Some(&mut changed_cells))?;
         } else {
-            update_position(board, x, axis, &mut changed_cells)?;
+            update_position(board, x, axis, Some(&mut changed_cells))?;
         }
     }
 
@@ -121,7 +123,7 @@ pub fn update_board(board: &mut AnalyzedBoard) -> StrResult<Vec<(usize, usize)>>
 
     for row in 0..size {
         for col in 0..size {
-            update_position(board, row, col, &mut updated_positions)?;
+            update_position(board, row, col, Some(&mut updated_positions))?;
         }
     }
 
@@ -151,10 +153,10 @@ pub fn update_positions<'a>(
             changed_positions.extend(positions);
         }
 
-        let square_index = row * square_size + col;
-        if checked_squares.contains(&square_index) {
+        let square_index = (row * square_size + col) / square_size;
+        if !checked_squares.contains(&square_index) {
             checked_squares.push(square_index);
-            let positions = update_square(board, row, col)?;
+            let positions = update_square_of(board, row, col)?;
             changed_positions.extend(positions);
         }
     }
