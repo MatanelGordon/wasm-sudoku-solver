@@ -242,8 +242,6 @@ pub mod infer_suite {
 
     #[test]
     fn should_infer_square() -> StrResult<()>{
-        //should infer in 0,2 there is 6
-
         let mut board = Board::new(9)?;
         let expected = InferredPosition{
             row: 0,
@@ -274,7 +272,7 @@ pub mod infer_suite {
 
         let mut analyzed = analyze_board(&board)?;
 
-        let inferred = infer_square_of(&analyzed, 0 ,2);
+        let inferred = infer_square_of(&analyzed, 0 ,2)?;
 
         assert_eq!(inferred.len(), 2);
 
