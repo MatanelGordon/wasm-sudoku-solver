@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 use crate::analyze::{AnalyzedBoard, AnalyzedCell};
 use std::fmt::{Display, Formatter};
+use crate::types::StrResult;
 
 // first number is the index, second number is the value.
 pub type InferType = (usize, usize);
@@ -13,15 +14,15 @@ pub struct InferredPosition<T = usize> {
 }
 
 impl<T> Display for InferredPosition<T>
-where
-    T: Display,
+    where
+        T: Display,
 {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "({},{}) -> {}", self.row, self.col, self.value)
     }
 }
 
-fn infer_group(group: &Vec<AnalyzedCell>) -> Vec<InferType> {
+fn infer_group(group: &Vec<AnalyzedCell>) -> StrResult<Vec<InferType>> {
     let known: Vec<usize> = group.iter().filter_map(|x| x.get_value()).collect();
 
     let flattened: Vec<usize> = group
@@ -35,7 +36,7 @@ fn infer_group(group: &Vec<AnalyzedCell>) -> Vec<InferType> {
     let is_valid_infer = flattened.iter().chain(known.iter()).collect::<HashSet<_>>().len() == group.len();
 
     if !is_valid_infer {
-        panic!("Invalid Infer");
+        return Err(format!("Invalid Infer reached"));
     }
 
     let single_repeating_values: Vec<usize> = flattened
@@ -73,57 +74,59 @@ fn infer_group(group: &Vec<AnalyzedCell>) -> Vec<InferType> {
             cloned[i] = AnalyzedCell::Value(v);
         }
 
-        results.extend(infer_group(&cloned));
+        results.extend(infer_group(&cloned)?);
     }
 
-    results
+    Ok(results)
 }
 
-pub fn infer_row(board: &AnalyzedBoard, index: usize) -> Vec<InferredPosition> {
+pub fn infer_row(board: &AnalyzedBoard, index: usize) -> StrResult<Vec<InferredPosition>> {
     let row = board.get_row(index);
 
     if row.is_none() {
-        return Vec::new();
+        return Ok(Vec::new());
     }
 
-    infer_group(row.unwrap())
+    let inferred = infer_group(row.unwrap())?
         .into_iter()
         .map(|(col, value)| InferredPosition {
             col,
             value,
             row: index,
         })
-        .collect()
+        .collect();
+
+    Ok(inferred)
 }
 
-pub fn infer_col(board: &AnalyzedBoard, index: usize) -> Vec<InferredPosition> {
+pub fn infer_col(board: &AnalyzedBoard, index: usize) -> StrResult<Vec<InferredPosition>> {
     let col = board.get_col(index);
 
     if col.is_none() {
-        return Vec::new();
+        return Ok(Vec::new());
     }
 
-    infer_group(col.unwrap())
+
+    let inferred = infer_group(col.unwrap())?
         .into_iter()
         .map(|(row, value)| InferredPosition {
             row,
             value,
             col: index,
         })
-        .collect()
+        .collect();
+
+    Ok(inferred)
 }
 
-pub fn infer_square(board: &AnalyzedBoard, row: usize, col: usize) -> Vec<InferredPosition> {
-    println!("Inferring square {row},{col}");
+pub fn infer_square(board: &AnalyzedBoard, row: usize, col: usize) -> StrResult<Vec<InferredPosition>> {
     let square = board.get_square(row, col);
 
     if square.is_none() {
-        return Vec::new();
+        return Ok(Vec::new());
     }
 
-    println!("Square: {:?}", &square);
-
-    infer_group(square.unwrap())
+    let inferred = infer_group(square.unwrap())?
         .into_iter()
         .map(|(flattened_index, value)| {
             let s_size = board.get_square_size();
@@ -136,15 +139,17 @@ pub fn infer_square(board: &AnalyzedBoard, row: usize, col: usize) -> Vec<Inferr
                 col: col * s_size + inner_col,
             }
         })
-        .collect()
+        .collect();
+
+    Ok(inferred)
 }
 
-pub fn infer_square_of(board: &AnalyzedBoard, row: usize, col: usize) -> Vec<InferredPosition> {
+pub fn infer_square_of(board: &AnalyzedBoard, row: usize, col: usize) -> StrResult<Vec<InferredPosition>> {
     let (s_row, s_col) = board.get_square_position_of(row, col);
     infer_square(board, s_row, s_col)
 }
 
-pub fn infer_all(board: &AnalyzedBoard) -> Vec<InferredPosition> {
+pub fn infer_all(board: &AnalyzedBoard) -> StrResult<Vec<InferredPosition>> {
     let mut positions: Vec<InferredPosition> = Vec::new();
     let size = board.get_size();
     let s_size = board.get_square_size();
@@ -153,9 +158,9 @@ pub fn infer_all(board: &AnalyzedBoard) -> Vec<InferredPosition> {
         let s_row = i / s_size;
         let s_col = i % s_size;
 
-        positions.extend(infer_row(board, i));
-        positions.extend(infer_col(board, i));
-        // positions.extend(infer_square(board, s_row, s_col));
+        positions.extend(infer_row(board, i)?);
+        positions.extend(infer_col(board, i)?);
+        positions.extend(infer_square(board, s_row, s_col)?);
     }
 
     positions.sort_by(|a, b| {
@@ -164,13 +169,13 @@ pub fn infer_all(board: &AnalyzedBoard) -> Vec<InferredPosition> {
     });
     positions.dedup_by(|a, b| a.row == b.row && a.col == b.col);
 
-    positions
+    Ok(positions)
 }
 
 pub fn infer_positions(
     board: &AnalyzedBoard,
     positions: &Vec<(usize, usize)>,
-) -> Vec<InferredPosition> {
+) -> StrResult<Vec<InferredPosition>> {
     let mut all_inferred: Vec<InferredPosition> = Vec::new();
     let mut cached_rows: Vec<usize> = Vec::new();
     let mut cached_cols: Vec<usize> = Vec::new();
@@ -180,18 +185,18 @@ pub fn infer_positions(
     for &(row, col) in positions.iter() {
         if !cached_rows.contains(&row) {
             cached_rows.push(row);
-            all_inferred.extend(infer_row(board, row));
+            all_inferred.extend(infer_row(board, row)?);
         }
 
         if !cached_cols.contains(&col) {
             cached_cols.push(col);
-            all_inferred.extend(infer_col(board, col));
+            all_inferred.extend(infer_col(board, col)?);
         }
 
         let square_index = row * square_size + col;
         if !cached_squares.contains(&square_index) {
             cached_squares.push(square_index);
-            all_inferred.extend(infer_square_of(board, row, col));
+            all_inferred.extend(infer_square_of(board, row, col)?);
         }
     }
 
@@ -201,5 +206,5 @@ pub fn infer_positions(
     });
     all_inferred.dedup_by(|a, b| a.row == b.row && a.col == b.col);
 
-    return all_inferred;
+    Ok(all_inferred)
 }
