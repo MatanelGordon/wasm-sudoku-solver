@@ -1,31 +1,15 @@
-use std::collections::HashSet;
 use crate::analyze::{AnalyzedBoard, AnalyzedCell};
-use std::fmt::{Display, Formatter};
-use crate::types::StrResult;
+use crate::types::{PositionalValue, StrResult};
+use std::collections::HashSet;
 
 // first number is the index, second number is the value.
 pub type InferType = (usize, usize);
-
-#[derive(PartialEq, Debug, Clone)]
-pub struct InferredPosition<T = usize> {
-    pub row: usize,
-    pub col: usize,
-    pub value: T,
-}
-
-impl<T> Display for InferredPosition<T>
-    where
-        T: Display,
-{
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "({},{}) -> {}", self.row, self.col, self.value)
-    }
-}
+pub type InferredPosition = PositionalValue<usize>;
 
 fn infer_group(group: &Vec<AnalyzedCell>) -> StrResult<Vec<InferType>> {
     let known: Vec<usize> = group.iter().filter_map(|x| x.get_value()).collect();
 
-    let flattened: Vec<usize> = group
+    let flattened_unknown: Vec<usize> = group
         .iter()
         .filter_map(|x| x.get_undetermined())
         .flatten()
@@ -33,15 +17,20 @@ fn infer_group(group: &Vec<AnalyzedCell>) -> StrResult<Vec<InferType>> {
         .map(|x| *x)
         .collect();
 
-    let is_valid_infer = flattened.iter().chain(known.iter()).collect::<HashSet<_>>().len() == group.len();
+    let is_valid_infer = flattened_unknown
+        .iter()
+        .chain(known.iter())
+        .collect::<HashSet<_>>()
+        .len()
+        == group.len();
 
     if !is_valid_infer {
         return Err(format!("Invalid Infer reached"));
     }
 
-    let single_repeating_values: Vec<usize> = flattened
+    let single_repeating_values: Vec<usize> = flattened_unknown
         .iter()
-        .filter(|&val| flattened.iter().filter(|&val1| val == val1).count() == 1)
+        .filter(|&val| flattened_unknown.iter().filter(|&val1| val == val1).count() == 1)
         .map(|x| *x)
         .collect();
 
@@ -106,7 +95,6 @@ pub fn infer_col(board: &AnalyzedBoard, index: usize) -> StrResult<Vec<InferredP
         return Ok(Vec::new());
     }
 
-
     let inferred = infer_group(col.unwrap())?
         .into_iter()
         .map(|(row, value)| InferredPosition {
@@ -119,7 +107,11 @@ pub fn infer_col(board: &AnalyzedBoard, index: usize) -> StrResult<Vec<InferredP
     Ok(inferred)
 }
 
-pub fn infer_square(board: &AnalyzedBoard, row: usize, col: usize) -> StrResult<Vec<InferredPosition>> {
+pub fn infer_square(
+    board: &AnalyzedBoard,
+    row: usize,
+    col: usize,
+) -> StrResult<Vec<InferredPosition>> {
     let square = board.get_square(row, col);
 
     if square.is_none() {
@@ -144,7 +136,11 @@ pub fn infer_square(board: &AnalyzedBoard, row: usize, col: usize) -> StrResult<
     Ok(inferred)
 }
 
-pub fn infer_square_of(board: &AnalyzedBoard, row: usize, col: usize) -> StrResult<Vec<InferredPosition>> {
+pub fn infer_square_of(
+    board: &AnalyzedBoard,
+    row: usize,
+    col: usize,
+) -> StrResult<Vec<InferredPosition>> {
     let (s_row, s_col) = board.get_square_position_of(row, col);
     infer_square(board, s_row, s_col)
 }

@@ -2,10 +2,11 @@ use crate::analyze::{AnalyzedBoard, AnalyzedCell};
 use crate::types::StrResult;
 use std::collections::HashSet;
 
-fn without_index<T>(iter: &Vec<T>, index: usize) -> Vec<T> where T : Clone
+fn without_index<T>(iter: &Vec<T>, index: usize) -> Vec<T>
+where
+    T: Clone,
 {
-    iter
-        .iter()
+    iter.iter()
         .clone()
         .enumerate()
         .filter(move |&(i, _)| i != index)
@@ -43,7 +44,6 @@ pub fn recalculate_cell(
     // println!("rows: {:?}", &rows);
     // println!("cols: {:?}", &cols);
     // println!("square: {:?}", &square);
-
 
     let known: HashSet<usize> = rows
         .iter()
@@ -155,20 +155,20 @@ fn _update_positions<'a>(
         if !checked_rows.contains(&row) {
             checked_rows.push(row);
             let positions = update_axis(board, row, true)?;
-            changed_positions.extend(positions);
+            changed_positions.extend(positions.iter());
         }
 
         if !checked_cols.contains(&col) {
             checked_cols.push(col);
             let positions = update_axis(board, col, false)?;
-            changed_positions.extend(positions);
+            changed_positions.extend(positions.iter());
         }
 
         let square_index = (row * square_size + col) / square_size;
         if !checked_squares.contains(&square_index) {
             checked_squares.push(square_index);
             let positions = update_square_of(board, row, col)?;
-            changed_positions.extend(positions);
+            changed_positions.extend(positions.iter());
         }
     }
 
@@ -192,7 +192,8 @@ pub fn update_positions<'a>(
         curr_positions = _update_positions(board, &curr_positions)?;
         all_positions.extend(curr_positions.iter());
     }
-    return Ok(all_positions);
+
+    Ok(all_positions)
 }
 
 pub fn update_board(board: &mut AnalyzedBoard) -> StrResult<Vec<(usize, usize)>> {

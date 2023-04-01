@@ -156,6 +156,18 @@ where
         self.get_rows().iter().flatten().collect()
     }
 
+    pub fn get_flat(&self) -> Vec<PositionalValue<&T>> {
+        self.get_rows_flat()
+            .iter()
+            .enumerate()
+            .map(|(i, &value)| PositionalValue {
+                value,
+                row: i / self.size,
+                col: i % self.size,
+            })
+            .collect()
+    }
+
     pub fn set(&mut self, row: usize, col: usize, value: T) -> StrResult<()> {
         let size = self.get_size();
 
@@ -178,7 +190,13 @@ where
         Ok(())
     }
 
-    pub fn set_inner_square(&mut self, s_row: usize, s_col: usize, s_index: usize, value: T) -> StrResult<()> {
+    pub fn set_inner_square(
+        &mut self,
+        s_row: usize,
+        s_col: usize,
+        s_index: usize,
+        value: T,
+    ) -> StrResult<()> {
         let square_size = self.get_square_size();
         let inner_row = s_index / square_size;
         let inner_col = s_index % square_size;

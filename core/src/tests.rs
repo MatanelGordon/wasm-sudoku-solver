@@ -241,38 +241,38 @@ pub mod infer_suite {
     use crate::types::StrResult;
 
     #[test]
-    fn should_infer_square() -> StrResult<()>{
+    fn should_infer_square() -> StrResult<()> {
         let mut board = Board::new(9)?;
-        let expected = InferredPosition{
+        let expected = InferredPosition {
             row: 0,
             col: 2,
-            value: 6
+            value: 6,
         };
 
-        let expected1 = InferredPosition{
-            row:0,
-            col:1,
-            value: 7
+        let expected1 = InferredPosition {
+            row: 0,
+            col: 1,
+            value: 7,
         };
 
         // setting up to infer (0,2) -> 6
         {
-            board.set(5,0,6)?;
-            board.set(8,1,6)?;
-            board.set(2,2,1)?;
-            board.set(1,2,2)?;
+            board.set(5, 0, 6)?;
+            board.set(8, 1, 6)?;
+            board.set(2, 2, 1)?;
+            board.set(1, 2, 2)?;
         }
 
         //setting up to infer (0,1) -> 7
         {
-            board.set(2,7,7)?;
-            board.set(1,5,7)?;
-            board.set(0,0,3)?;
+            board.set(2, 7, 7)?;
+            board.set(1, 5, 7)?;
+            board.set(0, 0, 3)?;
         }
 
         let mut analyzed = analyze_board(&board)?;
 
-        let inferred = infer_square_of(&analyzed, 0 ,2)?;
+        let inferred = infer_square_of(&analyzed, 0, 2)?;
 
         assert_eq!(inferred.len(), 2);
 
@@ -288,11 +288,9 @@ pub mod solve_suite {}
 
 #[cfg(test)]
 pub mod my_tests {
-    use crate::analyze::{analyze_board, AnalyzedCell};
     use crate::board::Board;
     use crate::solve::simple_solve;
     use crate::types::StrResult;
-    use crate::update::{update_board, update_positions};
 
     #[test]
     fn main_test() -> StrResult<()> {
@@ -323,6 +321,8 @@ pub mod my_tests {
         }
 
         let solved = simple_solve(&board)?;
+
+        println!("{}", &solved);
         Ok(())
     }
 }

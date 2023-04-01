@@ -1,6 +1,6 @@
 use crate::board::{Board, BoardData};
 use crate::types::StrResult;
-use crate::update::{update_board};
+use crate::update::update_board;
 use std::collections::HashSet;
 use std::fmt::{Display, Formatter};
 
