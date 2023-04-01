@@ -270,7 +270,7 @@ pub mod infer_suite {
             board.set(0, 0, 3)?;
         }
 
-        let mut analyzed = analyze_board(&board)?;
+        let analyzed = analyze_board(&board)?;
 
         let inferred = infer_square_of(&analyzed, 0, 2)?;
 
