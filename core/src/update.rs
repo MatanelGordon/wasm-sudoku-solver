@@ -33,11 +33,12 @@ pub fn recalculate_cell(
     }
 
     let s_size = board.get_square_size();
-    let rows = without_index(board.get_row(row).unwrap(), row);
-    let cols = without_index(board.get_col(col).unwrap(), col);
+    // eliminating the value itself
+    let rows = without_index(board.get_row(row).unwrap(), col);
+    let cols = without_index(board.get_col(col).unwrap(), row);
     let square = without_index(
         board.get_square_of(row, col).unwrap(),
-        (row * s_size + col) / s_size,
+        row % s_size * s_size + col % s_size,
     );
 
     // println!("-------------({row},{col})-------------");
