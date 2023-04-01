@@ -2,18 +2,6 @@ use crate::analyze::{AnalyzedBoard, AnalyzedCell};
 use crate::types::StrResult;
 use std::collections::HashSet;
 
-fn without_index<T>(iter: &Vec<T>, index: usize) -> Vec<T>
-where
-    T: Clone,
-{
-    iter.iter()
-        .clone()
-        .enumerate()
-        .filter(move |&(i, _)| i != index)
-        .map(|(_, x)| x.clone())
-        .collect()
-}
-
 pub fn recalculate_cell(
     board: &AnalyzedBoard,
     row: usize,
@@ -32,26 +20,15 @@ pub fn recalculate_cell(
         return Ok(None);
     }
 
-    let s_size = board.get_square_size();
-    // eliminating the value itself
-    let rows = without_index(board.get_row(row).unwrap(), col);
-    let cols = without_index(board.get_col(col).unwrap(), row);
-    let square = without_index(
-        board.get_square_of(row, col).unwrap(),
-        row % s_size * s_size + col % s_size,
-    );
-
-    // println!("-------------({row},{col})-------------");
-    // println!("rows: {:?}", &rows);
-    // println!("cols: {:?}", &cols);
-    // println!("square: {:?}", &square);
+    let rows = board.get_row(row).unwrap();
+    let cols = board.get_col(col).unwrap();
+    let square = board.get_square_of(row, col).unwrap();
 
     let known: HashSet<usize> = rows
         .iter()
         .chain(cols.iter())
         .chain(square.iter())
-        .filter(|x| x.is_value())
-        .map(|x| x.get_value().unwrap())
+        .filter_map(|x| x.get_value())
         .collect();
 
     let options: Vec<usize> = HashSet::<usize>::from_iter(1..=size)
