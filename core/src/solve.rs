@@ -61,7 +61,7 @@ fn guess_cell<'a>(
 
     let mut options = chosen.value.to_vec();
 
-    let get_frequency = |k:&usize| known_frequency.get(k).unwrap_or(&0);
+    let get_frequency = |k: &usize| known_frequency.get(k).unwrap_or(&0);
 
     options.sort_by(|a, b| get_frequency(a).cmp(get_frequency(b)));
 
@@ -72,7 +72,11 @@ fn guess_cell<'a>(
     })
 }
 
-fn solve_analyzed(board: &AnalyzedBoard, rng_thread: &mut ThreadRng, rec: usize) -> StrResult<Board> {
+fn solve_analyzed(
+    board: &AnalyzedBoard,
+    rng_thread: &mut ThreadRng,
+    rec: usize,
+) -> StrResult<Board> {
     println!("[^] Entering limit {rec}");
 
     let mut analyzed_board = board.clone();

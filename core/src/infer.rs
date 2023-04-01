@@ -6,13 +6,12 @@ use std::collections::HashSet;
 pub type InferType = (usize, usize);
 pub type InferredPosition = PositionalValue<usize>;
 
-fn uniq_positions(positions: &mut Vec<InferredPosition>, square_size: usize){
+fn uniq_positions(positions: &mut Vec<InferredPosition>, square_size: usize) {
     positions.sort_by(|a, b| {
         ((a.row as isize - b.row as isize) * square_size as isize + a.col as isize - b.col as isize)
             .cmp(&0)
     });
     positions.dedup_by(|a, b| a.row == b.row && a.col == b.col);
-
 }
 
 fn infer_group(group: &Vec<AnalyzedCell>) -> StrResult<Vec<InferType>> {
