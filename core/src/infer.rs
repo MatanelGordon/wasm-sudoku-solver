@@ -6,6 +6,15 @@ use std::collections::HashSet;
 pub type InferType = (usize, usize);
 pub type InferredPosition = PositionalValue<usize>;
 
+fn uniq_positions(positions: &mut Vec<InferredPosition>, square_size: usize){
+    positions.sort_by(|a, b| {
+        ((a.row as isize - b.row as isize) * square_size as isize + a.col as isize - b.col as isize)
+            .cmp(&0)
+    });
+    positions.dedup_by(|a, b| a.row == b.row && a.col == b.col);
+
+}
+
 fn infer_group(group: &Vec<AnalyzedCell>) -> StrResult<Vec<InferType>> {
     let known: Vec<usize> = group.iter().filter_map(|x| x.get_value()).collect();
 
@@ -159,11 +168,7 @@ pub fn infer_all(board: &AnalyzedBoard) -> StrResult<Vec<InferredPosition>> {
         positions.extend(infer_square(board, s_row, s_col)?);
     }
 
-    positions.sort_by(|a, b| {
-        ((a.row as isize - b.row as isize) * s_size as isize + a.col as isize - b.col as isize)
-            .cmp(&0)
-    });
-    positions.dedup_by(|a, b| a.row == b.row && a.col == b.col);
+    uniq_positions(&mut positions, s_size);
 
     Ok(positions)
 }
@@ -196,11 +201,7 @@ pub fn infer_positions(
         }
     }
 
-    all_inferred.sort_by(|a, b| {
-        ((a.row as isize - b.row as isize) * square_size as isize + a.col as isize - b.col as isize)
-            .cmp(&0)
-    });
-    all_inferred.dedup_by(|a, b| a.row == b.row && a.col == b.col);
+    uniq_positions(&mut all_inferred, square_size);
 
     Ok(all_inferred)
 }
