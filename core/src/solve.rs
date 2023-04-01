@@ -102,8 +102,7 @@ fn solve_analyzed(board: &AnalyzedBoard, rng_thread: &mut ThreadRng) -> StrResul
                     return Ok(res);
                 }
                 Err(e) => {
-                    println!("[-] error in solving: {e}");
-                    println!("[-] failed in ({row},{col}) ->  {opt}");
+                    println!("[-] error in solving when guessing ({row},{col}) ->  {opt} : {e}");
                     continue;
                 }
             }
