@@ -7,5 +7,5 @@ pub fn is_square(num: usize) -> bool {
 pub fn is_square_matrix<T>(data: &Vec<Vec<T>>) -> bool {
     let len: usize = data.len();
 
-    data.iter().map(|v| v.len()).all(|l| l == len)
+    data.iter().all(|l| l.len() == len)
 }
