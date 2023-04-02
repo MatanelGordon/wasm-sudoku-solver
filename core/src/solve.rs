@@ -22,15 +22,15 @@ pub fn simple_solve(board: &Board) -> StrResult<Board> {
 - Least amount of options.
 - Sort options by least frequent options.
 */
-fn guess_cell<'a>(
-    board: &'a AnalyzedBoard,
+fn guess_cell(
+    board: &AnalyzedBoard,
     thread_rng: &mut ThreadRng,
 ) -> Option<PositionalValue<Vec<usize>>> {
     let flattened_board = board.get_flat();
 
     let mut flatten_known = Vec::<usize>::new();
     let mut known_frequency = HashMap::<usize, usize>::new();
-    let mut flatten_unknown = Vec::<PositionalValue<&'a Vec<usize>>>::new();
+    let mut flatten_unknown = Vec::<PositionalValue<&Vec<usize>>>::new();
     let mut min_length = board.get_size();
 
     for cell in flattened_board.iter() {
