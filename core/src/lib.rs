@@ -1,7 +1,7 @@
 pub mod analyze;
 pub mod board;
+pub mod solve;
 mod infer;
-mod solve;
 mod tests;
 mod types;
 mod update;
