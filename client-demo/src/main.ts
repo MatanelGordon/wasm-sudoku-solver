@@ -1,23 +1,22 @@
 import './style.css'
-import typescriptLogo from './typescript.svg'
-import { setupCounter } from './counter'
+import {solve} from "client-lib";
+const root = document.querySelector<HTMLDivElement>('#app')!;
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://www.typescriptlang.org/" target="_blank">
-      <img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
-    </a>
-    <h1>Vite + TypeScript</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite and TypeScript logos to learn more
-    </p>
-  </div>
-`
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+const board = [
+    [0, 0, 0, 8, 0, 0, 6, 1, 0],
+    [2, 1, 0, 0, 0, 0, 0, 5, 0],
+    [0, 0, 4, 0, 0, 0, 0, 0, 7],
+    [0, 0, 0, 9, 0, 0, 0, 8, 0],
+    [0, 0, 0, 1, 6, 0, 0, 0, 0],
+    [1, 0, 7, 0, 0, 8, 0, 3, 0],
+    [0, 0, 0, 3, 0, 0, 0, 0, 0],
+    [0, 0, 9, 0, 0, 0, 0, 0, 4],
+    [0, 7, 0, 5, 0, 9, 2, 0, 1]
+];
+
+const raw_data = Uint32Array.from(board.flat());
+
+const res = solve(raw_data);
+
+console.log(res);
