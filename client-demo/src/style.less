@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+body{
+  display: grid;
+  place-items: center;
+  height: 100vh;
+}
+
+.grid-wrapper{
+  width: 70vmin;
+  aspect-ratio: 1;
+  position: relative;
+}
+
+.grid-overlay{
+  block-size: 100%;
+  inline-size: 100%;
+  display: grid;
+  position: absolute;
+  inset: 0;
+  grid-template-rows: repeat(2,1fr);
+}
+
+.grid-overlay .row{
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+}
+
+.grid-foreground{
+  block-size: 100%;
+  inline-size: 100%;
+  display: grid;
+  grid-template-rows: repeat(4,1fr);
+}
+
+.grid-foreground .row{
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+}
+
+.col{
+  border: 1px solid blue;
+}
+
+.grid-overlay .col {
+  border-width: 2px;
+}
+
+.row:first-child .col{
+  border-block-start: 0;
+}
+
+.row:last-child .col{
+  border-block-end: 0;
+}
+
+.row .col:first-child{
+  border-inline-start: 0;
+}
+
+.row .col:last-child{
+  border-inline-end: 0;
+}

@@ -1,6 +1,6 @@
-import './style.css'
+import './style.less'
 import {solve} from "client-lib";
-const root = document.querySelector<HTMLDivElement>('#app')!;
+// const root = document.querySelector<HTMLDivElement>('#app')!;
 
 
 const board = [
