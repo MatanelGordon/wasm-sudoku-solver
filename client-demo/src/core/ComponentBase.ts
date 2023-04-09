@@ -1,33 +1,44 @@
+import { DisposeFn, HtmlEventCallback, EventMap, Stringable } from '../types';
+import { registerEvent } from '../utils';
+
 export abstract class ComponentBase<P extends HTMLElement = HTMLElement> {
-  protected readonly element: P;
+	protected readonly element: P;
 
-  constructor(tagName: string) {
-    this.element = document.createElement(tagName) as P;
-  }
+	protected constructor(tagName: string) {
+		this.element = document.createElement(tagName) as P;
+	}
 
-  get classList() {
-    return this.element.classList;
-  }
+	get classList() {
+		return this.element.classList;
+	}
 
-  setAttribute(key: string, value: string | number | boolean) {
-    this.element.setAttribute(key, value.toString());
-  }
+	setAttribute(key: string, value: Stringable) {
+		this.element.setAttribute(key, value.toString());
+	}
 
-  setDataSet(dataset: Record<string, string>) {
-    Object.entries(dataset).forEach(([key, value]) => {
-      this.setAttribute(`data-${key}`, value);
-    });
-  }
+	setDataSet(dataset: Record<string, Stringable>) {
+		Object.entries(dataset).forEach(([key, value]) => {
+			this.setAttribute(`data-${key}`, value.toString());
+		});
+	}
 
-  getData(key: string) {
-    return this.element.dataset[`data-${key}`];
-  }
+	getData(key: string) {
+		return this.element.dataset[`data-${key}`];
+	}
 
-  getElement() {
-    return this.element;
-  }
+	registerEvent<P extends keyof EventMap>(event: P, cb: HtmlEventCallback<P>): DisposeFn {
+		return registerEvent<P>(this.element, event, cb);
+	}
 
-  mount(container: HTMLElement) {
-    container.appendChild(this.element);
-  }
+	mount(container: HTMLElement | ComponentBase) {
+		if (container instanceof ComponentBase) {
+			container.element.appendChild(this.element);
+			return;
+		}
+		container.appendChild(this.element);
+	}
+
+	dispose() {
+		this.element.remove();
+	}
 }

@@ -1,21 +1,21 @@
-import { ComponentBase } from "../core";
+import { ComponentBase } from '../core';
 
 export class Content extends ComponentBase<HTMLSpanElement> {
-  #value: number;
-  constructor() {
-    super("span");
+	#value: string;
+	constructor() {
+		super('span');
 
-    this.#value = 0;
+		this.#value = '';
 
-    this.element.style.pointerEvents = "none";
-  }
+		this.element.style.pointerEvents = 'none';
+	}
 
-  get value() {
-    return this.#value;
-  }
+	get value() {
+		return this.#value;
+	}
 
-  set value(value) {
-    this.#value = value;
-    this.element.textContent = value.toString();
-  }
+	set value(value) {
+		this.#value = value;
+		this.element.textContent = value;
+	}
 }
