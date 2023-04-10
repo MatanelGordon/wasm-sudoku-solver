@@ -140,27 +140,74 @@ export class Grid extends ComponentBase<HTMLDivElement> {
 
 	private initEvents() {
 		let clicked = false;
-		const disposeKeydown = registerEvent(window, 'keydown', (evt) => {
+		const disposeKeydown = registerEvent(window, 'keydown', evt => {
 			//todo: arrow movement using selectCell with singular
 
-			const { isTab, isEscape, isDigit, digit, isBackspace, isDelete } =
-				analyzeKeydownEvent(evt);
+			const {
+				isTab,
+				isEscape,
+				isDigit,
+				digit,
+				isBackspace,
+				isDelete,
+				isDown,
+				isUp,
+				isLeft,
+				isRight,
+			} = analyzeKeydownEvent(evt);
 
 			console.log(evt);
+			const lastSelected = Array.from(this.#selected_cells).at(-1) ?? this.#cells[0][0];
+			const currRow = lastSelected.row;
+			const currCol = lastSelected.col;
+
+			// At Tab unselect all and then the individual "focus" will take over
 			if (isTab) {
 				this.clearAllSelected();
-			} else if (isEscape) {
+			}
+			// At Escape key unselect all
+			else if (isEscape) {
 				this.clearAllSelected();
-			} else if (isDigit) {
+			}
+			// At any digit key set value appropriately
+			else if (isDigit) {
 				this.setValue(digit, clicked);
-			} else if (isBackspace) {
+			}
+			// At Backspace key undo value
+			else if (isBackspace) {
 				for (const cell of this.#selected_cells) {
 					cell.value = (cell.value / 10) | 0;
 				}
-			} else if (isDelete) {
+			}
+			// At Delete key delete value
+			else if (isDelete) {
 				for (const cell of this.#selected_cells) {
 					cell.value = 0;
 				}
+			}
+			// At Up key move up
+			else if (isUp) {
+				this.clearAllSelected();
+				const row = currRow - 1;
+				const nextRow = row < 0 ? this.size - 1 : row;
+				this.selectCell(nextRow, currCol, true);
+			}
+			// At Down key move down
+			else if (isDown) {
+				this.clearAllSelected();
+				this.selectCell((currRow + 1) % this.size, currCol, true);
+			}
+			// At Left key move left
+			else if (isLeft) {
+				this.clearAllSelected();
+				const col = currCol - 1;
+				const nextCol = col < 0 ? this.size - 1 : col;
+				this.selectCell(currRow, nextCol, true);
+			}
+			// At right key move right
+			else if (isRight) {
+				this.clearAllSelected();
+				this.selectCell(currRow, (currCol + 1) % this.size, true);
 			}
 
 			clicked = false;
@@ -170,7 +217,7 @@ export class Grid extends ComponentBase<HTMLDivElement> {
 			console.log('click');
 			clicked = true;
 
-			const { row, col, isCell } = analyzeClickEvent(evt);
+			const { row, col, isCell, isMultiplier } = analyzeClickEvent(evt);
 
 			if (!isCell) {
 				this.clearAllSelected();
@@ -179,9 +226,7 @@ export class Grid extends ComponentBase<HTMLDivElement> {
 
 			const cell = this.#cells[row][col];
 
-			const isMultiple = evt.ctrlKey || evt.metaKey;
-
-			if (!isMultiple) {
+			if (!isMultiplier) {
 				this.clearAllSelected([cell]);
 			}
 
