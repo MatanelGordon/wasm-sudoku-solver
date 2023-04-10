@@ -7,7 +7,8 @@
 @tailwind utilities;
 
 .grid-layout {
-	@apply border border-solid aspect-square;
+	@apply aspect-square;
+
 	--square-size: 0;
 	--border-color: rgba(222, 222, 222, 0.87);
 
@@ -18,14 +19,17 @@
 	.square-grid(var(--square-size));
 
 	.square {
-		@apply border-2 border-solid aspect-square;
-		.square-grid(var(--square-size));
+		border-style: solid;
+		border-width: medium;
 		border-color: inherit;
+
+		.square-grid(var(--square-size));
 	}
 
 	.cell {
 		@apply duration-100 ease-in;
-		@apply border border-solid aspect-square;
+		border-style: solid;
+		border-width: thin;
 		border-color: inherit;
 		container: cell / size;
 
@@ -57,7 +61,7 @@
 		.content {
 			z-index: 2;
 			@apply pointer-events-none;
-			font-size: 40cqi;
+			font-size: 40 cqi;
 			line-height: 100%;
 		}
 	}
