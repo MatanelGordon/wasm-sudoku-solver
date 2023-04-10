@@ -8,7 +8,6 @@ export interface AnalyzedKeydownEvent {
 	digit: number;
 	isBackspace: boolean;
 	isEscape: boolean;
-	isMultiplier: boolean;
 	isTab: boolean;
 	isDelete: boolean;
 }
@@ -25,7 +24,6 @@ export const analyzeKeydownEvent = (evt: KeyboardEvent): AnalyzedKeydownEvent =>
 	const isBackspace = key === 'Backspace';
 	const isDelete = key === 'Delete';
 	const isTab = key === 'Tab';
-	const isMultiplier = evt.ctrlKey || evt.metaKey;
 	const isDigit = key_code >= 48 && key_code <= 57;
 	const digit = isDigit ? key_code - 48 : -1;
 
@@ -36,7 +34,6 @@ export const analyzeKeydownEvent = (evt: KeyboardEvent): AnalyzedKeydownEvent =>
 		isRight,
 
 		isTab,
-		isMultiplier,
 
 		isBackspace,
 		isEscape,
