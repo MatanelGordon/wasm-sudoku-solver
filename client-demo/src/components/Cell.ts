@@ -70,7 +70,7 @@ export class Cell extends PositionalComponentBase<HTMLButtonElement> {
 	}
 
 	static isCell(el: HTMLElement) {
-		return el.dataset['cell'];
+		return !!el.dataset['cell']?.length ?? false;
 	}
 
 	protected get payload(): CellEvent {
