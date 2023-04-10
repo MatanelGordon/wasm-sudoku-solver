@@ -1,7 +1,8 @@
 import { ComponentBase } from '../core';
 import { Cell } from './Cell';
-import { registerEvent, removeChildren } from '../utils';
 import { Square } from './Square';
+import { registerEvent, removeChildren } from '../utils';
+import { analyzeClickEvent } from '../logic';
 import { DisposeFn } from '../types';
 
 export class Grid extends ComponentBase<HTMLDivElement> {
@@ -171,15 +172,14 @@ export class Grid extends ComponentBase<HTMLDivElement> {
 		const disposeClick = registerEvent(window, 'click', (evt: MouseEvent) => {
 			console.log('click');
 			clicked = true;
-			const target = evt.target as HTMLElement;
 
-			if (!(target && Cell.isCell(target))) {
+			const { row, col, isCell } = analyzeClickEvent(evt);
+
+			if (!isCell) {
 				this.clearAllSelected();
 				return;
 			}
 
-			const row = +(target.dataset['row'] ?? 0);
-			const col = +(target.dataset['col'] ?? 0);
 			const cell = this.#cells[row][col];
 
 			const isMultiple = evt.ctrlKey || evt.metaKey;
