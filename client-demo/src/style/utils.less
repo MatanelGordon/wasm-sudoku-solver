@@ -1,5 +1,10 @@
-.square-grid(@num){
-  display: grid;
-  grid-template-columns: repeat(@num, 1fr);
-  grid-template-rows: repeat(@num, 1fr);
+.square-grid(@num) {
+	display: grid;
+	grid-template-columns: repeat(@num, 1fr);
+	grid-template-rows: repeat(@num, 1fr);
+}
+
+.center() {
+	display: grid;
+	place-items: center;
 }

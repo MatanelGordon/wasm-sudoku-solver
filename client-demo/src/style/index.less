@@ -7,28 +7,29 @@
 @tailwind utilities;
 
 .grid-layout {
-	--square-size: 3;
+	@apply border border-solid aspect-square;
+	--square-size: 0;
 	--border-color: rgba(222, 222, 222, 0.87);
 
 	block-size: 80vmin;
-	aspect-ratio: 1;
-	border-radius: 5px;
-	contain: paint;
-	border: 1px solid var(--border-color);
+	max-block-size: 800px;
+	border-color: var(--border-color);
 
 	.square-grid(var(--square-size));
 
 	.square {
+		@apply border-2 border-solid aspect-square;
 		.square-grid(var(--square-size));
-		border: 2px solid var(--border-color);
+		border-color: inherit;
 	}
 
 	.cell {
-		border: 1px solid var(--border-color);
-		transition: background-color 0.1s ease-in;
-		display: grid;
-		place-items: center;
+		@apply duration-100 ease-in;
+		@apply border border-solid aspect-square;
+		border-color: inherit;
 		container: cell / size;
+
+		.center();
 
 		&:after {
 			@apply bg-indigo-600 opacity-0;
@@ -56,7 +57,7 @@
 		.content {
 			z-index: 2;
 			@apply pointer-events-none;
-			font-size: 50cqi;
+			font-size: 40cqi;
 			line-height: 100%;
 		}
 	}

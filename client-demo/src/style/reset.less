@@ -1,26 +1,27 @@
-:root{
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@import 'utils';
 
-  color-scheme: light dark;
+:root {
+	font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+	line-height: 1.5;
+	font-weight: 400;
 
-  color: var(--secondary);
-  background-color: var(--primary);
+	color-scheme: light dark;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
+	color: var(--secondary);
+	background-color: var(--primary);
+
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-text-size-adjust: 100%;
 }
 
-*{
-  position: relative;
+* {
+	position: relative;
 }
 
 body {
-  display: grid;
-  place-items: center;
-  height: 100vh;
+	.center();
+	height: 100vh;
 }
