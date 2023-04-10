@@ -38,6 +38,10 @@ export abstract class ComponentBase<P extends HTMLElement = HTMLElement> {
 		container.appendChild(this.element);
 	}
 
+	setCSSVariable(name: string, value: Stringable | null) {
+		this.element.style.setProperty(`--${name}`, value?.toString() ?? null);
+	}
+
 	dispose() {
 		this.element.remove();
 	}
