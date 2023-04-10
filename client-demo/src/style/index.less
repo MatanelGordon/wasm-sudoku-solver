@@ -26,6 +26,9 @@
 	.cell {
 		border: 1px solid var(--border-color);
 		transition: background-color 0.1s ease-in;
+		display: grid;
+		place-items: center;
+		container: cell / size;
 
 		&:after {
 			@apply bg-indigo-600 opacity-0;
@@ -52,9 +55,9 @@
 
 		.content {
 			z-index: 2;
-			--median: calc(calc(50vmin / var(--square-size) / var(--square-size)));
-			font-size: clamp(12px, var(--median), 2rem);
 			@apply pointer-events-none;
+			font-size: 50cqi;
+			line-height: 100%;
 		}
 	}
 }
