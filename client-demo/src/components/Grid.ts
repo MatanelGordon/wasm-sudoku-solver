@@ -43,6 +43,14 @@ export class Grid extends ComponentBase<HTMLDivElement> {
 		this.render();
 	}
 
+	loadEmpty(size: number) {
+		if (size < 4) {
+			throw new Error('Size too small');
+		}
+		this.#data = new Array(size).fill(null).map(() => new Uint32Array(size));
+		this.render();
+	}
+
 	render() {
 		const prevSize = this.#cells.length;
 		if (prevSize !== this.size) {
@@ -74,6 +82,8 @@ export class Grid extends ComponentBase<HTMLDivElement> {
 		const size = this.size;
 		const s_size = this.square_size;
 		this.#cells = new Array(size).fill(null).map(() => []);
+
+		this.setCSSVariable('square-size', s_size);
 
 		for (let s_row = 0; s_row < s_size; s_row++) {
 			for (let s_col = 0; s_col < s_size; s_col++) {
@@ -110,22 +120,57 @@ export class Grid extends ComponentBase<HTMLDivElement> {
 		}
 	}
 
+	private setValue(value: number, initial = true) {
+		for (const cell of this.#selected_cells) {
+			if (initial) {
+				cell.value = value;
+			} else {
+				const prev = cell.value;
+				const next = prev * 10 + value;
+
+				if (next > this.size) {
+					cell.value = value;
+				} else {
+					cell.value = next;
+				}
+			}
+		}
+	}
+
 	private initEvents() {
+		let clicked = false;
 		const disposeKeydown = registerEvent(window, 'keydown', (evt) => {
 			//todo: arrow movement using selectCell with singular
 			//todo: update numerical values
 			//todo: update Escape, Enter, BackSpace
 			//todo: implement multiple cells update when pressing Ctrl \ Meta
 
-			if (evt.code === 'Tab') {
+			const key_code = evt.key.charCodeAt(0);
+
+			console.log(evt);
+			if (evt.key === 'Tab') {
 				this.clearAllSelected();
-			} else if (evt.code === 'Escape') {
+			} else if (evt.key === 'Escape') {
 				this.clearAllSelected();
+			} else if (key_code >= 48 && key_code <= 57) {
+				const digit = key_code - 48;
+				this.setValue(digit, clicked);
+			} else if (evt.key === 'Backspace') {
+				for (const cell of this.#selected_cells) {
+					cell.value = (cell.value / 10) | 0;
+				}
+			} else if (evt.key === 'Delete') {
+				for (const cell of this.#selected_cells) {
+					cell.value = 0;
+				}
 			}
+
+			clicked = false;
 		});
 
 		const disposeClick = registerEvent(window, 'click', (evt: MouseEvent) => {
 			console.log('click');
+			clicked = true;
 			const target = evt.target as HTMLElement;
 
 			if (!(target && Cell.isCell(target))) {
