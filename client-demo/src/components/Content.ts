@@ -6,8 +6,6 @@ export class Content extends ComponentBase<HTMLSpanElement> {
 		super('span');
 
 		this.#value = '';
-
-		this.element.style.pointerEvents = 'none';
 	}
 
 	get value() {

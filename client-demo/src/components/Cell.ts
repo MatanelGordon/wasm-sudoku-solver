@@ -3,15 +3,19 @@ import { Content } from './Content';
 import { BehaviorSubject, distinctUntilChanged, map, skip } from 'rxjs';
 import { EventCallback } from '../types';
 
-export interface SelectChangeEvent {
+export interface CellEvent {
 	target: Cell;
-	isSelected: boolean;
+	selected: boolean;
+	row: number;
+	col: number;
+	value: number;
 }
 
 export class Cell extends PositionalComponentBase<HTMLButtonElement> {
 	readonly #contentElement: Content;
 
 	readonly #selectedSubject: BehaviorSubject<boolean>;
+	readonly #valueSubject: BehaviorSubject<number>;
 
 	constructor() {
 		super('button');
@@ -19,35 +23,32 @@ export class Cell extends PositionalComponentBase<HTMLButtonElement> {
 		this.setDataSet({ cell: true });
 
 		this.#selectedSubject = new BehaviorSubject(false);
+		this.#valueSubject = new BehaviorSubject(0);
 
 		this.#contentElement = new Content();
 		this.#contentElement.classList.add('content');
 		this.#contentElement.mount(this.element);
 
 		this.registerEvent('focus', () => {
-			console.log('focues');
+			console.log('focus');
 			this.selected = true;
 		});
 
-		this.registerEvent('click', () => {
-			console.log('click');
-			this.selected = !this.selected;
-		});
+		this.onvalue = ({ value }) => {
+			if (value > 0) {
+				this.#contentElement.value = value.toString();
+			} else {
+				this.#contentElement.value = '';
+			}
+		};
 	}
 
 	get value() {
-		const val = this.#contentElement.value;
-		if (!+val) return 0;
-		return +val;
+		return this.#valueSubject.value;
 	}
 
 	set value(value: number) {
-		if (value > 0) {
-			this.#contentElement.value = value.toString();
-		} else {
-			this.#contentElement.value = '';
-		}
-
+		this.#valueSubject.next(value);
 		this.setDataSet({ value });
 	}
 
@@ -72,22 +73,38 @@ export class Cell extends PositionalComponentBase<HTMLButtonElement> {
 		return el.dataset['cell'];
 	}
 
-	dispose() {
-		this.#selectedSubject.complete();
-		super.dispose();
+	protected get payload(): CellEvent {
+		return {
+			target: this,
+			col: this.col,
+			row: this.row,
+			value: this.value,
+			selected: this.selected,
+		};
 	}
 
-	onSelectChange(cb: EventCallback<SelectChangeEvent>) {
-		const subscription = this.#selectedSubject
+	set onselect(cb: EventCallback<CellEvent>) {
+		this.#selectedSubject
 			.pipe(
 				skip(1),
 				distinctUntilChanged(),
-				map((isSelected) => ({
-					isSelected,
-					target: this,
-				})),
+				map(() => this.payload),
 			)
 			.subscribe(cb);
-		return () => subscription.unsubscribe();
+	}
+
+	set onvalue(cb: EventCallback<CellEvent>) {
+		this.#valueSubject
+			.pipe(
+				distinctUntilChanged(),
+				map(() => this.payload),
+			)
+			.subscribe(cb);
+	}
+
+	dispose() {
+		this.#selectedSubject.complete();
+		this.#valueSubject.complete();
+		super.dispose();
 	}
 }

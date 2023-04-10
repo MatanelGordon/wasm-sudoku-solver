@@ -53,17 +53,18 @@ export class Grid extends ComponentBase<HTMLDivElement> {
 	private createCell(row: number, col: number) {
 		const size = this.size;
 		const cell = new Cell();
+
 		cell.col = col;
 		cell.row = row;
 		cell.tabIndex = row * size + col + 1;
 
-		cell.onSelectChange(({ target, isSelected }) => {
-			if (isSelected) {
+		cell.onselect = ({ target, selected }) => {
+			if (selected) {
 				this.#selected_cells.add(target);
 			} else {
 				this.#selected_cells.delete(target);
 			}
-		});
+		};
 
 		return cell;
 	}
@@ -99,6 +100,7 @@ export class Grid extends ComponentBase<HTMLDivElement> {
 		if (!cell || (value !== undefined && cell.selected === value)) return;
 
 		cell.selected = value ?? !cell.selected;
+		console.log(`cell(${row}, ${col}) -> ${cell.selected}`);
 	}
 
 	private clearAllSelected(exceptions: Array<Cell> = []) {
@@ -117,14 +119,19 @@ export class Grid extends ComponentBase<HTMLDivElement> {
 
 			if (evt.code === 'Tab') {
 				this.clearAllSelected();
+			} else if (evt.code === 'Escape') {
+				this.clearAllSelected();
 			}
 		});
 
 		const disposeClick = registerEvent(window, 'click', (evt: MouseEvent) => {
-			console.log(evt);
+			console.log('click');
 			const target = evt.target as HTMLElement;
 
-			if (!(target && Cell.isCell(target))) return;
+			if (!(target && Cell.isCell(target))) {
+				this.clearAllSelected();
+				return;
+			}
 
 			const row = +(target.dataset['row'] ?? 0);
 			const col = +(target.dataset['col'] ?? 0);
@@ -136,14 +143,7 @@ export class Grid extends ComponentBase<HTMLDivElement> {
 				this.clearAllSelected([cell]);
 			}
 
-			console.log(`cell(${row}, ${col})`);
-			console.log(cell);
-
-			this.selectCell(row, col);
-
-			setTimeout(() => {
-				console.log(this.#selected_cells);
-			}, 1000);
+			this.selectCell(row, col, true);
 		});
 
 		this.#disposeEvents = () => {

@@ -1,59 +1,60 @@
-@import "variables";
-@import "reset";
-@import "utils";
+@import 'variables';
+@import 'reset';
+@import 'utils';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-
 .grid-layout {
-  --square-size: 3;
-  --border-color: rgba(222, 222, 222, 0.87);
+	--square-size: 3;
+	--border-color: rgba(222, 222, 222, 0.87);
 
-  block-size: 80vmin;
-  aspect-ratio: 1;
-  border-radius: 5px;
-  contain: paint;
-  border: 1px solid var(--border-color);
+	block-size: 80vmin;
+	aspect-ratio: 1;
+	border-radius: 5px;
+	contain: paint;
+	border: 1px solid var(--border-color);
 
+	.square-grid(var(--square-size));
 
-  .square-grid(var(--square-size));
+	.square {
+		.square-grid(var(--square-size));
+		border: 2px solid var(--border-color);
+	}
 
-  .square {
-    .square-grid(var(--square-size));
-    border: 2px solid var(--border-color);
-  }
+	.cell {
+		border: 1px solid var(--border-color);
+		transition: background-color 0.1s ease-in;
 
-  .cell {
-    border: 1px solid var(--border-color);
-    transition: background-color .1s ease-in;
+		&:after {
+			@apply bg-indigo-600 opacity-0;
+			@apply transition-opacity ease-in-out duration-200;
+			content: '';
+			inline-size: 100%;
+			block-size: 100%;
+			position: absolute;
+			inset: 0;
+			z-index: 1;
+		}
 
-    &:after {
-      content: "";
-      inline-size: 100%;
-      block-size: 100%;
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      @apply bg-indigo-600 opacity-0;
-      @apply transition-opacity ease-in-out duration-200;
-    }
+		&:hover:after {
+			@apply opacity-60;
+		}
 
-    &:hover:after{
-      @apply opacity-60;
-    }
+		&:focus {
+			@apply outline-0;
+		}
 
-    &:focus,
-    &.active {
-    @apply bg-indigo-600 outline-0;
-    }
+		&.active {
+			@apply bg-indigo-600;
+		}
 
-    .content {
-      z-index: 2;
-      --median: calc(calc(40vmin / var(--square-size) / var(--square-size)));
-      font-size: clamp(12px, var(--median), 2rem);
-    @apply pointer-events-none;
-    }
-  }
+		.content {
+			z-index: 2;
+			--median: calc(calc(50vmin / var(--square-size) / var(--square-size)));
+			font-size: clamp(12px, var(--median), 2rem);
+			@apply pointer-events-none;
+		}
+	}
 }
