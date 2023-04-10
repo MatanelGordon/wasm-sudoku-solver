@@ -202,5 +202,6 @@ export class Grid extends ComponentBase<HTMLDivElement> {
 		this.#cells = [];
 		this.#disposeEvents?.();
 		this.#selected_cells.clear();
+		this.#disposeEvents = undefined;
 	}
 }
