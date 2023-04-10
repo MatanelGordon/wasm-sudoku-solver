@@ -4,3 +4,7 @@ printWidth = 100
 trailingComma = "all"
 tabWidth = 4
 useTabs = true
+arrowParens = "avoid"
+bracketSpacing = true
+bracketSameLine = false
+endOfLine = "lf"
