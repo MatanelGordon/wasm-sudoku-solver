@@ -1,7 +1,7 @@
 import { ComponentBase } from '../core';
 import { Cell } from './Cell';
 import { Square } from './Square';
-import { registerEvent, removeChildren } from '../utils';
+import { analyzeKeydownEvent, registerEvent, removeChildren } from '../utils';
 import { analyzeClickEvent } from '../logic';
 import { DisposeFn } from '../types';
 
@@ -142,25 +142,22 @@ export class Grid extends ComponentBase<HTMLDivElement> {
 		let clicked = false;
 		const disposeKeydown = registerEvent(window, 'keydown', (evt) => {
 			//todo: arrow movement using selectCell with singular
-			//todo: update numerical values
-			//todo: update Escape, Enter, BackSpace
-			//todo: implement multiple cells update when pressing Ctrl \ Meta
 
-			const key_code = evt.key.charCodeAt(0);
+			const { isTab, isEscape, isDigit, digit, isBackspace, isDelete } =
+				analyzeKeydownEvent(evt);
 
 			console.log(evt);
-			if (evt.key === 'Tab') {
+			if (isTab) {
 				this.clearAllSelected();
-			} else if (evt.key === 'Escape') {
+			} else if (isEscape) {
 				this.clearAllSelected();
-			} else if (key_code >= 48 && key_code <= 57) {
-				const digit = key_code - 48;
+			} else if (isDigit) {
 				this.setValue(digit, clicked);
-			} else if (evt.key === 'Backspace') {
+			} else if (isBackspace) {
 				for (const cell of this.#selected_cells) {
 					cell.value = (cell.value / 10) | 0;
 				}
-			} else if (evt.key === 'Delete') {
+			} else if (isDelete) {
 				for (const cell of this.#selected_cells) {
 					cell.value = 0;
 				}
