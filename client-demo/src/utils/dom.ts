@@ -1,4 +1,4 @@
-import { DisposeFn, HtmlEventCallback, EventMap } from './types';
+import { DisposeFn, HtmlEventCallback, EventMap } from '../types';
 
 export const removeChildren = (element: HTMLElement) => {
 	while (element.firstChild) {
