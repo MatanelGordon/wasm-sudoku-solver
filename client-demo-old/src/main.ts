@@ -23,6 +23,6 @@ grid.mount(root);
 
 const res = solve(raw_data);
 
-grid.load(raw_data);
-
+// grid.load(raw_data);
+grid.loadEmpty(16);
 console.log(res);

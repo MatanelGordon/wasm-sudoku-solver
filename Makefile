@@ -8,10 +8,10 @@ build-core:
 	cargo build
 
 build-lib:
-	wasm-pack build ./client-lib
+	wasm-pack build ./wasm-lib
 
 run-dev:
-	npm run dev -w client-demo
+	npm run dev -w client
 
 clean:
 	rm -rf **/target **/dist **/build
