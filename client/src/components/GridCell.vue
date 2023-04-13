@@ -27,7 +27,7 @@
 		},
 		size: {
 			type: Number,
-			required: true
+			default: 0
 		},
 		className: String,
 		selected: {
