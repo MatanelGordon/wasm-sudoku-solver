@@ -1,6 +1,7 @@
 import './style/index.less';
-import { solve } from 'client-lib';
+import { solve } from 'wasm-lib';
 import { Grid } from './components/Grid';
+import {Mat} from "client/src/types";
 
 const root = document.querySelector<HTMLDivElement>('#app')!;
 
