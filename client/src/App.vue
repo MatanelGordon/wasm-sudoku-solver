@@ -1,7 +1,8 @@
 <script setup lang="ts">
 	import Grid from '@/components/GridLayout.vue';
 	import { Mat } from '@/types';
-
+	import { useGridStore } from '@/stores/grid';
+	const grid = useGridStore();
 	const data = [
 		[0, 0, 0, 8, 0, 0, 6, 1, 0],
 		[2, 1, 0, 0, 0, 0, 0, 5, 0],
@@ -20,11 +21,15 @@
 		[0, 0, 0, 4],
 		[0, 3, 0, 0]
 	];
+
+	setTimeout(() => {
+		grid.load(data);
+	}, 1000);
 </script>
 
 <template>
 	<main class="main-layout">
-		<Grid :data="data" />
+		<Grid />
 	</main>
 </template>
 

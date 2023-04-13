@@ -1,19 +1,38 @@
 <script setup lang="ts">
-	import { Mat } from '@/types';
 	import { computed } from 'vue';
 	import { squareTransform } from '@/utils/matrix';
-	import { roundSqrt } from '@/utils/math';
-	import GridCell from '@/components/GridCell.vue';
+	import GridCell, { CellEventPayload as CellEventPayload } from './GridCell.vue';
+	import { useGridStore } from '@/stores/grid';
+	import { useEvent } from '@/hooks';
+	import { analyzeKeydownEvent, isMulti } from '@/utils';
+	import { useKeydownHandler } from '@/hooks/useKeydownHandler';
 
-	interface GridProps {
-		data: Mat<number>;
-		borderColor?: string;
+	const props = defineProps({
+		borderColor: {
+			type: String,
+			default: '#ccc'
+		}
+	});
+
+	const grid = useGridStore();
+
+	const squares = computed(() => squareTransform(grid.data));
+
+	useKeydownHandler(grid);
+
+	function cellFocus(evt: CellEventPayload<FocusEvent>) {
+		const { row, col } = evt;
+		console.log('focus', evt);
+		grid.setSelected(row, col, true);
 	}
 
-	const props = defineProps<GridProps>();
+	function cellClick(evt: CellEventPayload<MouseEvent>) {
+		console.log('clicked', evt);
+		const shouldAddToExisting = isMulti(evt.event);
+		const next = !evt.selected;
 
-	const square_size = computed(() => roundSqrt(props.data.length));
-	const squares = computed(() => squareTransform(props.data));
+		grid.setSelected(evt.row, evt.col, next, next && !shouldAddToExisting);
+	}
 </script>
 
 <template>
@@ -25,12 +44,15 @@
 		>
 			<GridCell
 				v-for="(cell, j) in square"
-				class-name="cell"
-				:size="props.data.length"
+				class="cell"
+				:size="grid.size"
 				:col="cell.col"
 				:row="cell.row"
-				:value="cell.value"
+				:value="cell.value.value"
+				:selected="cell.value.selected"
 				:key="`c-${i}-${j}-${cell.value}`"
+				@focus="cellFocus"
+				@click="cellClick"
 			/>
 		</div>
 	</div>
@@ -49,7 +71,8 @@
 	}
 
 	.grid {
-		--square-size: v-bind(square_size);
+		--square-size: v-bind(grid.square_size);
+		--border-color: v-bind(props.borderColor);
 		container: grid-container / inline-size;
 		aspect-ratio: 1;
 		block-size: 80vmin;
@@ -57,14 +80,15 @@
 
 		.square {
 			.square-grid();
-			border: #ccc solid medium;
+			--color: var(--border-color, #ccc);
+			border: var(--color) solid medium;
 			container: square / inline-size;
 		}
 
 		.cell {
 			font-size: calc(100cqi / var(--square-size) * 0.56);
-			--color: #ccc;
 			--selected-color: var(--vt-c-accent);
+			--color: var(--border-color, #ccc);
 		}
 	}
 </style>

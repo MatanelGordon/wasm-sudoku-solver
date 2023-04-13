@@ -34,6 +34,10 @@ export const squareTransform = <T>(data: Mat<T>): Mat<SquareValue<T>> => {
 	return squares;
 };
 
-export const matMap = <T, U>(matrix: Mat<T>, cb: (value: T) => U): Mat<U> => {
-	return matrix.map(group => group.map(cb));
+export const map = <T, U>(matrix: Mat<T>, cb: (value: T, i: number, j: number) => U): Mat<U> => {
+	return matrix.map((group, i) => group.map((item, j) => cb(item, i, j)));
+};
+
+export const forEach = <T>(matrix: Mat<T>, cb: (value: T) => unknown) => {
+	matrix.forEach(group => group.forEach(cb));
 };

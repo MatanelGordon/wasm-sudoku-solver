@@ -1,6 +1,6 @@
 import type { Mat } from '@/types';
 import { expect, describe, it } from 'vitest';
-import { matMap, squareTransform } from '@/utils/matrix';
+import { map, squareTransform } from '@/utils/matrix';
 
 describe('matrix util', () => {
 	it('should transform matrix to square', () => {
@@ -35,6 +35,6 @@ describe('matrix util', () => {
 
 		const multiply = (value: number) => value * 2;
 
-		expect(matMap(input, multiply)).toEqual(expected);
+		expect(map(input, multiply)).toEqual(expected);
 	});
 });

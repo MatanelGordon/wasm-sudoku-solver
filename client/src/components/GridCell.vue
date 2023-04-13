@@ -1,7 +1,16 @@
 <script setup lang="ts">
 	import { computed } from 'vue';
+	import type { ComponentEvents } from '@/types';
+
+	export interface CellEventPayload<Evt extends Event> {
+		row: number;
+		col: number;
+		selected: boolean;
+		event: Evt;
+	}
 
 	const emit = defineEmits(['focus', 'click']);
+	type CellEvents = ComponentEvents<typeof emit>;
 
 	const props = defineProps({
 		value: {
@@ -27,21 +36,35 @@
 		}
 	});
 
-	const tab_index = computed(() => props.row * props.size + props.col);
-	const payload = computed(() => ({
-		row: props.row,
-		col: props.col,
-		selected: props.selected
-	}));
+	const tab_index = computed(() => props.row * props.size + props.col + 1);
+
+	function createEmitter<Evt extends Event>(name: CellEvents) {
+		return (evt: Evt) => {
+			evt.preventDefault();
+			evt.stopPropagation();
+			const payload: CellEventPayload<Evt> = {
+				row: props.row,
+				col: props.col,
+				selected: props.selected,
+				event: evt
+			};
+
+			emit(name, payload);
+		};
+	}
+
+	const focusHandler = createEmitter('focus');
+	const clickHandler = createEmitter('click');
 </script>
 
 <template>
 	<button
+		data-cell="true"
 		class="cell"
 		:class="[props.className, { active: props.selected }]"
 		:tabindex="tab_index"
-		@focus="emit('focus', payload)"
-		@click="emit('click', payload)"
+		@focus="focusHandler"
+		@mousedown="clickHandler"
 	>
 		{{ props.value > 0 ? props.value.toString() : '' }}
 	</button>
