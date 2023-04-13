@@ -76,11 +76,28 @@
 		outline: none;
 		background: none;
 		font-weight: 700;
-		border: thin solid var(--color);
-		color: var(--color);
+		border: thin solid #ccc;
+		transition: background-color ease-out 0.1s;
 
 		&.active {
 			background-color: var(--selected-color, indianred);
+			color: var(--selected-color-text, var(--color-dark));
+		}
+
+		&:not(.active) {
+			&::after {
+				content: '';
+				block-size: 100%;
+				inline-size: 100%;
+				position: absolute;
+				inset: 0;
+				background-color: var(--selected-color, indianred);
+				opacity: 0;
+			}
+
+			&:hover:after {
+				opacity: 0.6;
+			}
 		}
 	}
 </style>

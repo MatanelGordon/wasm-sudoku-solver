@@ -3,7 +3,7 @@ import { createPinia } from 'pinia';
 import 'normalize.css';
 
 import App from './App.vue';
-import './styles/index.css';
+import './styles/index.less';
 
 const app = createApp(App);
 

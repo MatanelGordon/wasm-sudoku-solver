@@ -1,0 +1,30 @@
+:root {
+	--color-dark: #212121;
+	--color-light: #eaeaea;
+
+	--color-primary: var(--color-dark);
+	--color-secondary: var(--color-light);
+	--color-accent: #4caf50;
+
+	@media (prefers-color-scheme: light) {
+		--color-primary: var(--color-light);
+		--color-secondary: var(--color-dark);
+	}
+
+	color-scheme: dark light;
+	line-height: 1.6;
+	font-family: Inter, -apple-system, system-ui;
+	font-size: 15px;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+	position: relative;
+	font-weight: normal;
+}

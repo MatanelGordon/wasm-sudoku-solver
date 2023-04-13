@@ -87,8 +87,9 @@
 
 		.cell {
 			font-size: calc(100cqi / var(--square-size) * 0.56);
-			--selected-color: var(--vt-c-accent);
-			--color: var(--border-color, #ccc);
+			border-color: var(--border-color);
+			--selected-color: var(--color-accent);
+			--selected-color-text: var(--color-secondary);
 		}
 	}
 </style>

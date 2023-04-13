@@ -29,7 +29,7 @@
 
 <template>
 	<main class="main-layout">
-		<Grid />
+		<Grid border-color="var(--color-secondary)" />
 	</main>
 </template>
 
