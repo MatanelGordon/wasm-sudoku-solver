@@ -1,7 +1,8 @@
 {
   "workspaces": [
     "client-demo",
-    "client"
+    "client",
+    "client-vanilla"
   ],
   "devDependencies": {
     "autoprefixer": "^10.4.14",
