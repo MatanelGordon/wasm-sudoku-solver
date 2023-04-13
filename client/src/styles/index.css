@@ -1,0 +1,7 @@
+@import './base.css';
+
+#app {
+	padding: 1rem;
+	font-weight: normal;
+	height: 100vh;
+}
