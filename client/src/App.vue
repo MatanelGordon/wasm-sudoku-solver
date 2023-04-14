@@ -43,5 +43,6 @@
 		justify-content: center;
 		align-items: center;
 		padding: 0.5rem;
+		writing-mode: vertical-lr;
 	}
 </style>
