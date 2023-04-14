@@ -74,7 +74,7 @@
 		--border-color: v-bind(props.borderColor);
 		container: grid-container / inline-size;
 		aspect-ratio: 1;
-		block-size: 80vmin;
+		inline-size: 100%;
 		.square-grid();
 
 		.square {
@@ -85,7 +85,7 @@
 		}
 
 		.cell {
-			font-size: calc(100cqi / var(--square-size) * 0.56);
+			font-size: calc(100cqmin / var(--square-size) * 0.56);
 			border-color: var(--border-color);
 			--selected-color: var(--color-accent);
 			--selected-color-text: var(--color-secondary);

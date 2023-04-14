@@ -1,6 +1,6 @@
 <script setup lang="ts">
 	import { computed } from 'vue';
-	import type { ComponentEvents } from '@/types';
+	import type { ComponentEvent } from '@/types';
 
 	export interface CellEventPayload<Evt extends Event> {
 		row: number;
@@ -10,7 +10,7 @@
 	}
 
 	const emit = defineEmits(['focus', 'click']);
-	type CellEvents = ComponentEvents<typeof emit>;
+	type CellEvent = ComponentEvent<typeof emit>;
 
 	const props = defineProps({
 		value: {
@@ -38,7 +38,7 @@
 
 	const tab_index = computed(() => props.row * props.size + props.col + 1);
 
-	function createEmitter<Evt extends Event>(name: CellEvents) {
+	function createEmitter<Evt extends Event>(name: CellEvent) {
 		return (evt: Evt) => {
 			evt.preventDefault();
 			evt.stopPropagation();

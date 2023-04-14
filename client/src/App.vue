@@ -2,6 +2,7 @@
 	import Grid from '@/components/GridLayout.vue';
 	import { Mat } from '@/types';
 	import { useGridStore } from '@/stores/grid';
+	import ActionPanel from '@/components/ActionPanel.vue';
 	const grid = useGridStore();
 	const data = [
 		[0, 0, 0, 8, 0, 0, 6, 1, 0],
@@ -29,15 +30,18 @@
 
 <template>
 	<main class="main-layout">
+		<ActionPanel />
 		<Grid border-color="var(--color-secondary)" />
 	</main>
 </template>
 
 <style>
 	.main-layout {
-		height: 100%;
-		width: 100%;
-		display: grid;
-		place-items: center;
+		inline-size: 90vmin;
+		display: flex;
+		flex-flow: column nowrap;
+		justify-content: center;
+		align-items: center;
+		padding: 0.5rem;
 	}
 </style>
