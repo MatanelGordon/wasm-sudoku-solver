@@ -4,7 +4,7 @@
 	import GridCell, { CellEventPayload as CellEventPayload } from './GridCell.vue';
 	import { useGridStore } from '@/stores/grid';
 	import { isMulti } from '@/utils';
-	import { useKeydownHandler } from '@/hooks/useKeydownHandler';
+	import { useKeydownHandler } from '@/composables/useKeydownHandler';
 
 	const props = defineProps({
 		borderColor: {

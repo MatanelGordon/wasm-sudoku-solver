@@ -1,6 +1,6 @@
 import type { GridStore } from '@/stores/grid';
 import { analyzeKeydownEvent } from '@/utils';
-import { useEvent } from '@/hooks/useEvent';
+import { useEvent } from '@/composables/useEvent';
 
 export function useKeydownHandler(grid: GridStore) {
 	function keydownHandler(evt: KeyboardEvent) {
