@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 import type { Mat } from '@/types';
-import { forEach, map } from '@/utils/matrix';
+import { forEach, generateSudokuBoard, map } from '@/utils/matrix';
 import { roundSqrt } from '@/utils/math';
 
 export interface StoreData {
@@ -74,6 +74,7 @@ export const useGridStore = defineStore('grid', () => {
 		});
 	}
 
+	load(generateSudokuBoard(9));
 	return {
 		data,
 		size,

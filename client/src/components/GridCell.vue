@@ -40,8 +40,6 @@
 
 	function createEmitter<Evt extends Event>(name: CellEvent) {
 		return (evt: Evt) => {
-			evt.preventDefault();
-			evt.stopPropagation();
 			const payload: CellEventPayload<Evt> = {
 				row: props.row,
 				col: props.col,
@@ -63,8 +61,8 @@
 		class="cell"
 		:class="[props.className, { active: props.selected }]"
 		:tabindex="tab_index"
-		@focus="focusHandler"
-		@mousedown="clickHandler"
+		@focus.prevent.stop="focusHandler"
+		@mousedown.prevent.stop="clickHandler"
 	>
 		{{ props.value > 0 ? props.value.toString() : '' }}
 	</button>

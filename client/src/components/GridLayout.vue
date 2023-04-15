@@ -4,7 +4,7 @@
 	import GridCell, { CellEventPayload as CellEventPayload } from './GridCell.vue';
 	import { useGridStore } from '@/stores/grid';
 	import { isMulti } from '@/utils';
-	import { useKeydownHandler } from '@/composables/useKeydownHandler';
+	import { useKeydownHandler } from '@/composables';
 
 	const props = defineProps({
 		borderColor: {
@@ -21,12 +21,10 @@
 
 	function cellFocus(evt: CellEventPayload<FocusEvent>) {
 		const { row, col } = evt;
-		console.log('focus', evt);
 		grid.setSelected(row, col, true);
 	}
 
 	function cellClick(evt: CellEventPayload<MouseEvent>) {
-		console.log('clicked', evt);
 		const shouldAddToExisting = isMulti(evt.event);
 		const next = !evt.selected;
 
