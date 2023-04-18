@@ -70,7 +70,7 @@ where
         }
     }
 
-    pub fn validate_matrix(data: &BoardData<T>) -> ValidMatrixOptions {
+    fn validate_matrix(data: &BoardData<T>) -> ValidMatrixOptions {
         if !is_square_matrix(data) {
             return ValidMatrixOptions::NonSquareMatrix;
         }
