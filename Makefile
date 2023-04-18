@@ -4,13 +4,13 @@ install:
 test-core:
 	cargo test -p core --lib
 
-build-core:
+build-core: test-core
 	cargo build
 
-build-lib:
+build-lib: build-core
 	wasm-pack build ./wasm-lib
 
-run-dev:
+run-dev: build-lib
 	npm run dev -w client
 
 clean:
