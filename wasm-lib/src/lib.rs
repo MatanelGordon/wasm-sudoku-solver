@@ -50,3 +50,17 @@ pub fn solve(arr: &[usize]) -> Result<Vec<usize>, String> {
 
     return Ok(solved_flat);
 }
+
+#[wasm_bindgen]
+pub fn is_valid(arr: &[usize]) -> bool{
+    let flat_data = Vec::from(arr);
+    let square_size = (flat_data.len() as f32).sqrt().floor() as usize;
+    let data = flat_data
+        .chunks(square_size)
+        .map(|slice| slice.to_vec())
+        .collect::<BoardData>();
+
+    let board = Board::from(&data);
+
+    return board.is_ok() && board.unwrap().is_valid_numerical();
+}
