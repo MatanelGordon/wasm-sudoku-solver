@@ -2,7 +2,7 @@ import type { Mat } from '@/types';
 import { roundSqrt } from '@/utils/math';
 import { solve as wasmSolve, is_valid } from 'wasm-lib';
 
-type MatValue = number | { value: number };
+export type MatValue = number | { value: number };
 const resolveMatValue = (val: MatValue): number => (typeof val === 'object' ? val.value : val);
 
 const flatMatrix = (matrix: Mat<MatValue>): Uint32Array =>
