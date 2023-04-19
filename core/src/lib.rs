@@ -5,4 +5,4 @@ pub mod solve;
 mod tests;
 mod types;
 mod update;
-mod validators;
+pub mod validators;
