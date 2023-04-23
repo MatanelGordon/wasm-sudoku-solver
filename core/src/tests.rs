@@ -73,19 +73,6 @@ pub mod board_suite {
     }
 
     #[test]
-    fn board_invalid_numerical() {
-        let mut board = Board::new(4).expect("Failed initializing board");
-        board.set(0, 1, 100).expect("Failed setting value");
-        assert!(!board.is_valid_numerical());
-    }
-
-    #[test]
-    fn board_valid_numerical() {
-        let board = Board::new(4).expect("Failed initializing board");
-        assert!(board.is_valid_numerical());
-    }
-
-    #[test]
     fn board_filter_specific_value() {
         let mut board = Board::new(4).expect("Failed initializing board");
         let value = &6;
@@ -319,7 +306,6 @@ pub mod solve_suite {
 
         let solved = simple_solve(&board)?;
 
-        assert_eq!(solved.is_valid_numerical(), true);
         assert_eq!(solved.is_full(), true);
         Ok(())
     }
@@ -330,7 +316,6 @@ pub mod solve_suite {
 
         let solved = simple_solve(&board)?;
 
-        assert_eq!(solved.is_valid_numerical(), true);
         assert_eq!(solved.is_full(), true);
         Ok(())
     }

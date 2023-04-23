@@ -33,14 +33,6 @@ impl Board<usize> {
             .find(|&col| col.iter().find(|&&cell| cell == EMPTY_ITEM).is_some())
             .is_none()
     }
-
-    pub fn is_valid_numerical(&self) -> bool {
-        self.get_rows_flat()
-            .iter()
-            .map(|&&x| x)
-            .find(|&val| val > self.size)
-            .is_none()
-    }
 }
 
 impl<T> Board<T>
