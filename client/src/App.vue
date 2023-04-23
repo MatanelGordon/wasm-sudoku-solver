@@ -1,9 +1,11 @@
 <script setup lang="ts">
 	import Grid from '@/components/GridLayout.vue';
 	import ActionPanel from '@/components/ActionPanel.vue';
+	import Toast from 'primevue/toast';
 </script>
 
 <template>
+	<Toast />
 	<main class="main-layout">
 		<ActionPanel />
 		<Grid border-color="var(--color-secondary)" />
