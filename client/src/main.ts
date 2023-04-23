@@ -4,7 +4,7 @@ import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
 
 import 'normalize.css';
-import 'primevue/resources/themes/vela-green/theme.css';
+import 'primevue/resources/themes/saga-orange/theme.css';
 import 'primevue/resources/primevue.min.css';
 import 'primeicons/primeicons.css';
 
