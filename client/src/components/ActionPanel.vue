@@ -1,13 +1,15 @@
 <script setup lang="ts">
 	import { ref } from 'vue';
 	import Button from 'primevue/button';
+	import { useToast } from 'primevue/usetoast';
 	import type { Mat } from '@/types';
 	import { useGridStore } from '@/stores/grid';
-	import { clone, createSquareMatrix, generateSudokuBoard, map, solve } from '@/utils';
+	import { clone, createSquareMatrix, generateSudokuBoard, isValid, map, solve } from '@/utils';
 	import { controlledWatchEffect } from '@/composables';
 
 	const grid = useGridStore();
 	const beforeSolve = ref(grid.data);
+	const toast = useToast();
 
 	const isPlaying = ref(false);
 
@@ -33,6 +35,15 @@
 			resetGrid(before);
 			return;
 		}
+
+		if (!isValid(grid.data)) {
+			toast.add({
+				severity: 'error',
+				summary: 'Could not solve invalid board'
+			});
+			return;
+		}
+
 		beforeSolve.value = clone(grid.data);
 		const solved = solve(grid.data);
 		setDisableWatch(true);
