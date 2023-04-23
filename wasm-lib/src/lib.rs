@@ -4,6 +4,7 @@ mod utils;
 use sudoku_core::board::{Board, BoardData};
 use sudoku_core::solve::simple_solve;
 use wasm_bindgen::prelude::*;
+use sudoku_core::validators::is_valid_sudoku;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -62,5 +63,5 @@ pub fn is_valid(arr: &[usize]) -> bool{
 
     let board = Board::from(&data);
 
-    return board.is_ok() && board.unwrap().is_valid_numerical();
+    return board.is_ok() && is_valid_sudoku(&board.unwrap());
 }
