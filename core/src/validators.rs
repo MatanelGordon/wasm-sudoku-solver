@@ -16,7 +16,6 @@ pub fn is_square_matrix<T>(data: &BoardData<T>) -> bool {
 
 pub fn is_valid_sudoku(board: &Board) -> bool {
     let size = board.get_size();
-    let mut all_options = Vec::<usize>::new();
 
     for row in 0..size {
         for col in 0..size {
@@ -24,24 +23,13 @@ pub fn is_valid_sudoku(board: &Board) -> bool {
             let cols = board.get_col(col).unwrap();
             let square = board.get_square_of(row, col).unwrap();
 
-            all_options.clear();
-            all_options.extend(rows);
-            all_options.extend(cols);
-            all_options.extend(square);
-
-            let uniq = all_options
-                .iter()
-                .filter(|&&val| val > 0)
-                .collect::<HashSet<_>>();
-            let is_repeating = uniq
-                .iter()
-                .all(|&num| all_options.iter().filter(|&val| val == num).count() > 3);
-
-            if is_repeating {
-                return false;
+            for group in vec![rows, cols, square].into_iter() {
+                let is_repeating = group.iter().any(|val| *val > 0 && group.iter().filter(|&x| x == val).count() > 1);
+                if is_repeating {
+                    return false
+                }
             }
         }
     }
-
     true
 }
