@@ -25,10 +25,10 @@
 	}
 
 	function cellClick(evt: CellEventPayload<MouseEvent>) {
-		const shouldAddToExisting = isMulti(evt.event);
-		const next = !evt.selected;
+		const shouldNotAddToExisting = !isMulti(evt.event);
+		const notSelected = !evt.selected;
 
-		grid.setSelected(evt.row, evt.col, next, next && !shouldAddToExisting);
+		grid.setSelected(evt.row, evt.col, notSelected, notSelected && shouldNotAddToExisting);
 	}
 </script>
 
