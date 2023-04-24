@@ -12,6 +12,7 @@ export function useKeydownHandler(grid: GridStore) {
 		} else if (isDelete) {
 			grid.setSelectedValue(0);
 		} else if (isDigit) {
+			console.log('size', grid.size);
 			for (const { row, col, value } of grid.selected_cells) {
 				let nextValue = value * 10 + digit;
 				nextValue = nextValue > grid.size ? digit : nextValue;

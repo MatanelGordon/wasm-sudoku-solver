@@ -1,5 +1,5 @@
 import type { Mat } from '@/types';
-import { randomRange, roundSqrt } from '@/utils/math';
+import { roundSqrt } from '@/utils/math';
 
 export interface SquareValue<T> {
 	row: number;
@@ -46,21 +46,3 @@ export const clone = <T>(matrix: Mat<T>): Mat<T> => map(matrix, x => x);
 
 export const createSquareMatrix = <T extends string | boolean | number>(size: number, fill: T) =>
 	new Array(size).fill(null).map(() => new Array(size).fill(fill));
-
-export const generateSudokuBoard = (size: number): Mat<number> => {
-	const options = Array.from(new Array(size).keys());
-	const board = createSquareMatrix(size, 0);
-
-	for (const num of options) {
-		let row: number, col: number;
-
-		do {
-			row = randomRange(0, size);
-			col = randomRange(0, size);
-		} while (board[row][col] !== 0);
-
-		board[row][col] = num;
-	}
-
-	return board;
-};
