@@ -3,6 +3,8 @@
 
 Sudoku Solver using WASM and Vue3 Composition API.
 
+<img width="684" alt="Screenshot 2023-04-25 at 19 18 46" src="https://user-images.githubusercontent.com/72258277/234340119-0a864ef5-7af9-44e5-b94b-c7e5f6822a89.png">
+
 ## The Project
 
 This is a rust+node monorepo with several packages:
