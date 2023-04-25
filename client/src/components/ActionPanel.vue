@@ -13,7 +13,6 @@
 	const grid = useGridStore();
 	const beforeSolve = ref(grid.data);
 
-	const is_loading = ref(false);
 	const hasPlayed = ref(false);
 
 	//toast
@@ -64,9 +63,6 @@
 			return;
 		}
 
-		setTimeout(() => {
-			is_loading.value = true;
-		});
 		beforeSolve.value = clone(grid.data);
 		const solved = solve(grid.data);
 		setDisableWatch(true);
@@ -88,7 +84,6 @@
 		<div class="start">
 			<Button
 				:icon="hasPlayed ? pIcon('undo') : pIcon('play')"
-				:loading="is_loading"
 				severity="success"
 				class="action-button"
 				rounded
