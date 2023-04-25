@@ -1,14 +1,23 @@
 <script setup lang="ts">
-	import { ref, watch } from 'vue';
+	import { onMounted, ref, watch } from 'vue';
 	import Button from 'primevue/button';
 	import OverlayPanel from 'primevue/overlaypanel';
 	import SelectButton from 'primevue/selectbutton';
 	import { useToast } from 'primevue/usetoast';
 	import type { Mat } from '@/types';
 	import { useGridStore } from '@/stores/grid';
-	import { clone, createSquareMatrix, generateSudokuBoard, isValid, map, solve } from '@/utils';
-	import { controlledWatchEffect } from '@/composables';
+	import {
+		clone,
+		createSquareMatrix,
+		generateSudokuBoard,
+		isValid,
+		map,
+		NUMERICAL_TRANSFORMER,
+		solve
+	} from '@/utils';
+	import { controlledWatchEffect, useStorageState } from '@/composables';
 	import { DEFAULT_GRID_SIZE, GRID_SIZES } from '@/constants/grid';
+	import { GRID_SIZE_KEY } from '@/constants/localStorage';
 
 	const grid = useGridStore();
 	const beforeSolve = ref(grid.data);
@@ -20,7 +29,11 @@
 	// settings related
 	const settings_overlay = ref<OverlayPanel | null>(null);
 	const GRID_SIZE_OPTIONS = ref(GRID_SIZES.map(value => ({ value, name: `${value}X${value}` })));
-	const settings_grid_size = ref<number>(DEFAULT_GRID_SIZE);
+	const settings_grid_size = useStorageState<number>(
+		GRID_SIZE_KEY,
+		DEFAULT_GRID_SIZE,
+		NUMERICAL_TRANSFORMER
+	);
 
 	watch(
 		settings_grid_size,

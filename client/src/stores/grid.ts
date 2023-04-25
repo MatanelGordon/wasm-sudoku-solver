@@ -75,7 +75,6 @@ export const useGridStore = defineStore('grid', () => {
 		});
 	}
 
-	load(generateSudokuBoard(DEFAULT_GRID_SIZE));
 	return {
 		data,
 		size,
