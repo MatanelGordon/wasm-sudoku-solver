@@ -12,7 +12,6 @@
 
 	const grid = useGridStore();
 	const beforeSolve = ref(grid.data);
-
 	const hasPlayed = ref(false);
 
 	//toast
