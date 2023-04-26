@@ -1,9 +1,8 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 import type { Mat } from '@/types';
-import { forEach, generateSudokuBoard, map } from '@/utils';
+import { forEach, map } from '@/utils';
 import { roundSqrt } from '@/utils/math';
-import { DEFAULT_GRID_SIZE } from '@/constants/grid';
 
 export interface StoreData {
 	readonly row: number;
@@ -36,9 +35,11 @@ export const useGridStore = defineStore('grid', () => {
 		}
 	}
 
-	function setSelectedValue(value: number) {
+	function setSelectedValue(value: number | ((prev: number) => number)) {
 		selected_cells.value.forEach(({ row, col }) => {
-			data.value[row][col].value = value;
+			const prev = data.value[row][col].value;
+
+			data.value[row][col].value = typeof value === 'function' ? value(prev) : value;
 		});
 	}
 

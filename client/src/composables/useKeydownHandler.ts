@@ -12,13 +12,10 @@ export function useKeydownHandler(grid: GridStore) {
 		} else if (isDelete) {
 			grid.setSelectedValue(0);
 		} else if (isDigit) {
-			console.log('size', grid.size);
-			for (const { row, col, value } of grid.selected_cells) {
-				let nextValue = value * 10 + digit;
-				nextValue = nextValue > grid.size ? digit : nextValue;
-				grid.setValue(row, col, nextValue);
-			}
-			grid.setSelectedValue(digit);
+			grid.setSelectedValue(prev => {
+				const nextValue = prev * 10 + digit;
+				return nextValue > grid.size ? digit : nextValue;
+			});
 		} else if (isBackspace) {
 			for (const { row, col, value } of grid.selected_cells) {
 				const nextValue = (value / 10) | 0;
