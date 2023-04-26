@@ -6,7 +6,7 @@
 	import { GRID_SIZE_KEY } from '@/constants/localStorage';
 	import { DEFAULT_GRID_SIZE } from '@/constants/grid';
 	import { useGridStore } from '@/stores/grid';
-	import { generateSudokuBoard } from '@/utils';
+	import { generateSudokuBoard } from '@/logic';
 
 	const grid = useGridStore();
 

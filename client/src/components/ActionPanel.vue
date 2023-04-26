@@ -1,23 +1,16 @@
 <script setup lang="ts">
-	import { onMounted, ref, watch } from 'vue';
+	import { ref, watch } from 'vue';
 	import Button from 'primevue/button';
 	import OverlayPanel from 'primevue/overlaypanel';
 	import SelectButton from 'primevue/selectbutton';
 	import { useToast } from 'primevue/usetoast';
 	import type { Mat } from '@/types';
 	import { useGridStore } from '@/stores/grid';
-	import {
-		clone,
-		createSquareMatrix,
-		generateSudokuBoard,
-		isValid,
-		map,
-		NUMERICAL_TRANSFORMER,
-		solve
-	} from '@/utils';
+	import { clone, createSquareMatrix, map, NUMERICAL_TRANSFORMER } from '@/utils';
 	import { controlledWatchEffect, useStorageState } from '@/composables';
 	import { DEFAULT_GRID_SIZE, GRID_SIZES } from '@/constants/grid';
 	import { GRID_SIZE_KEY } from '@/constants/localStorage';
+	import { generateSudokuBoard, isValid, solve } from '@/logic';
 
 	const grid = useGridStore();
 	const beforeSolve = ref(grid.data);

@@ -2,12 +2,8 @@ import type { Mat } from '@/types';
 import { randomRange, roundSqrt } from '@/utils/math';
 import { solve as wasmSolve, is_valid } from 'wasm-lib';
 import { createSquareMatrix } from '@/utils/matrix';
-
-export type MatValue = number | { value: number };
-const resolveMatValue = (val: MatValue): number => (typeof val === 'object' ? val.value : val);
-
-const flatMatrix = (matrix: Mat<MatValue>): Uint32Array =>
-	Uint32Array.from(matrix.flat().map(resolveMatValue));
+import { flatMatrix } from '@/logic/utils';
+import type { MatValue } from '@/logic/utils';
 
 export const solve = (matrix: Mat<MatValue>): Mat<number> => {
 	const flat_grid = flatMatrix(matrix);
