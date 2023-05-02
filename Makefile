@@ -7,10 +7,10 @@ test-core:
 build-core: test-core
 	cargo build
 
-build-lib: build-core
+build-wasm: build-core
 	wasm-pack build ./wasm-lib
 
-run-dev: build-lib
+run-dev: build-wasm
 	npm run dev -w client
 
 clean:
