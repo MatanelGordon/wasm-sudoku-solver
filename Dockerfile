@@ -1,6 +1,11 @@
-FROM rust as wasm-build
-WORKDIR /usr/rust
-COPY ./core ./core
-COPY ./wasm-lib ./wasm
-RUN make build-lib
+FROM 15012002/wasm-pack as builder
+WORKDIR /usr/app
+COPY . .
+RUN make install
+RUN make build
+
+FROM nginx
+WORKDIR /usr/share/nginx/html
+COPY --from=builder /usr/app/dist .
+
 
