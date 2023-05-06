@@ -1,8 +1,10 @@
-use crate::analyze::{analyze_board, is_full_board, to_board, AnalyzedBoard, AnalyzedCell};
+use crate::analyze::{
+    analyze_board, is_full_board, to_board, update_board, update_positions, AnalyzedBoard,
+    AnalyzedCell,
+};
 use crate::board::Board;
 use crate::infer::{infer_all, infer_positions, InferredPosition};
 use crate::types::{PositionalValue, StrResult};
-use crate::update::{update_board, update_positions};
 use rand::rngs::ThreadRng;
 use rand::seq::IteratorRandom;
 use std::cmp::min;
@@ -85,7 +87,7 @@ fn solve_analyzed(
 
     println!("{}", &analyzed_board);
 
-    // updating the board until there is nothing to update
+    // updating the board1 until there is nothing to updates
     while positions.len() > 0 {
         changed_positions.clear();
 

@@ -16,15 +16,19 @@ pub fn is_valid_sudoku(board: &Board) -> bool {
     let size = board.get_size();
     let square_size = board.get_square_size();
 
-    for axis in 0..size{
+    for axis in 0..size {
         let rows = board.get_row(axis).unwrap();
         let cols = board.get_col(axis).unwrap();
-        let square = board.get_square(axis / square_size, axis % square_size).unwrap();
+        let square = board
+            .get_square(axis / square_size, axis % square_size)
+            .unwrap();
 
         for group in vec![rows, cols, square].into_iter() {
-            let is_repeating = group.iter().any(|val| *val > 0 && group.iter().filter(|&x| x == val).count() > 1);
+            let is_repeating = group
+                .iter()
+                .any(|val| *val > 0 && group.iter().filter(|&x| x == val).count() > 1);
             if is_repeating {
-                return false
+                return false;
             }
         }
     }

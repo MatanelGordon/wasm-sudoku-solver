@@ -118,7 +118,7 @@ pub fn update_axis(
     Ok(changed_cells)
 }
 
-// update multiple positions using row, col, and square caching
+// updates multiple positions using row, col, and square caching
 fn _update_positions<'a>(
     board: &'a mut AnalyzedBoard,
     positions: &'a Vec<(usize, usize)>,
@@ -142,7 +142,7 @@ fn _update_positions<'a>(
             changed_positions.extend(positions.iter());
         }
 
-        let square_index = (row * square_size + col) / square_size;
+        let square_index = row * square_size + col;
         if !checked_squares.contains(&square_index) {
             checked_squares.push(square_index);
             let positions = update_square_of(board, row, col)?;

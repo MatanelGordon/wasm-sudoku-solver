@@ -62,7 +62,7 @@ pub fn to_board(analyzed_board: &AnalyzedBoard) -> StrResult<Board> {
 
     if has_undetermined {
         return Err(format!(
-            "Could not convert to numerical board: Found Undetermined items"
+            "Could not convert to numerical board1: Found Undetermined items"
         ));
     }
 
