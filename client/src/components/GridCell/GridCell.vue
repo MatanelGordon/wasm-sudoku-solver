@@ -1,13 +1,7 @@
 <script setup lang="ts">
-	import { computed } from 'vue';
 	import type { ComponentEvent } from '@/types';
-
-	export interface CellEventPayload<Evt extends Event> {
-		row: number;
-		col: number;
-		selected: boolean;
-		event: Evt;
-	}
+	import type { CellEventPayload } from './types';
+	import { computed } from 'vue';
 
 	const emit = defineEmits(['focus', 'click']);
 	type CellEvent = ComponentEvent<typeof emit>;

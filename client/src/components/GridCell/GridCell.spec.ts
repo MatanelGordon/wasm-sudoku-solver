@@ -1,6 +1,6 @@
 import { it, describe, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import GridCell from '@/components/GridCell.vue';
+import GridCell from '@/components/GridCell/GridCell.vue';
 
 describe('Grid Cell tests', () => {
 	it('should have active class when selected=true', () => {

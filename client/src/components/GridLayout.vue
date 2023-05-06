@@ -1,7 +1,8 @@
 <script setup lang="ts">
 	import { computed } from 'vue';
 	import { squareTransform } from '@/utils/matrix';
-	import GridCell, { CellEventPayload as CellEventPayload } from './GridCell.vue';
+	import type { CellEventPayload as CellEventPayload } from './GridCell';
+	import GridCell from './GridCell';
 	import { useGridStore } from '@/stores/grid';
 	import { isMulti } from '@/utils';
 	import { useKeydownHandler } from '@/composables';
