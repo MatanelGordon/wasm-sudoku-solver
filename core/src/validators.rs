@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use crate::board::{Board, BoardData};
 
 pub fn is_square(num: usize) -> bool {

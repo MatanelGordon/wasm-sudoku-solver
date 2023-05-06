@@ -312,7 +312,7 @@ pub mod solve_suite {
 
     #[test]
     fn should_solve_empty_board() -> StrResult<()> {
-        let mut board = Board::new(9)?;
+        let board = Board::new(9)?;
 
         let solved = simple_solve(&board)?;
 
