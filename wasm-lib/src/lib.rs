@@ -3,8 +3,8 @@ extern crate core;
 mod utils;
 use sudoku_core::board::{Board, BoardData};
 use sudoku_core::solve::simple_solve;
-use wasm_bindgen::prelude::*;
 use sudoku_core::validators::is_valid_sudoku;
+use wasm_bindgen::prelude::*;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -53,7 +53,7 @@ pub fn solve(arr: &[usize]) -> Result<Vec<usize>, String> {
 }
 
 #[wasm_bindgen]
-pub fn is_valid(arr: &[usize]) -> bool{
+pub fn is_valid(arr: &[usize]) -> bool {
     let flat_data = Vec::from(arr);
     let square_size = (flat_data.len() as f32).sqrt().floor() as usize;
     let data = flat_data

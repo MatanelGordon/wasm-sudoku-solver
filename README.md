@@ -52,7 +52,14 @@ to build the wasm-lib after changes run the following:
 make build-lib
 ```
 
-> NOTE: `build-lib` also builds the `core` and will 
+> NOTE: `build-lib` also builds the `core` and will run tests
+
+### Using Docker
+
+```bash
+docker build . -t sudoku
+docker run sudoku
+```
 
 ## Contributing
 
