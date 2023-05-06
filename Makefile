@@ -13,5 +13,8 @@ build-wasm: build-core
 run-dev: build-wasm
 	npm run dev -w client
 
+build: build-wasm
+	npm run build -w client
+
 clean:
 	rm -rf **/target **/dist **/build
