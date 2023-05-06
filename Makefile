@@ -17,4 +17,4 @@ build: build-wasm
 	npm run build -w client
 
 clean:
-	rm -rf **/target **/dist **/build
+	rm -rf **/target **/dist **/build dist
