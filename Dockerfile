@@ -1,4 +1,4 @@
-FROM 15012002/wasm-pack as builder
+FROM 15012002/wasm-pack:latest as builder
 WORKDIR /usr/app
 COPY . .
 RUN make install
