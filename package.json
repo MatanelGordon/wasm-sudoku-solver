@@ -1,6 +1,5 @@
 {
   "workspaces": [
-    "client-demo",
     "client"
   ]
 }
